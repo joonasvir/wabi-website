@@ -36,13 +36,25 @@
     .nav-logo { display: flex; align-items: center; text-decoration: none; }
 
     /* Wabi glyph: 5 circles in quincunx */
-    .wabi-glyph { position: relative; width: 38px; height: 24px; opacity: 0.3; }
+    .wabi-glyph { position: relative; width: 38px; height: 24px; opacity: 0.3; transition: opacity 0.3s ease; }
     .wabi-glyph .dot { position: absolute; border-radius: 50%; background: #191919; width: 12px; height: 12px; }
     .wabi-glyph .dot:nth-child(1) { top: 0; left: 1px; }
     .wabi-glyph .dot:nth-child(2) { top: 0; left: 13px; }
     .wabi-glyph .dot:nth-child(3) { top: 0; left: 25px; }
     .wabi-glyph .dot:nth-child(4) { top: 12px; left: 7px; }
     .wabi-glyph .dot:nth-child(5) { top: 12px; left: 19px; }
+    .wabi-glyph .dot { transition: opacity 0.3s ease; }
+    .nav-logo:hover .wabi-glyph { opacity: 0.6; }
+    .nav-logo:hover .dot { animation: dotShimmer 1.2s ease-in-out infinite; }
+    .nav-logo:hover .dot:nth-child(1) { animation-delay: 0s; }
+    .nav-logo:hover .dot:nth-child(2) { animation-delay: 0.12s; }
+    .nav-logo:hover .dot:nth-child(3) { animation-delay: 0.24s; }
+    .nav-logo:hover .dot:nth-child(4) { animation-delay: 0.36s; }
+    .nav-logo:hover .dot:nth-child(5) { animation-delay: 0.48s; }
+    @keyframes dotShimmer {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.3; transform: scale(0.85); }
+    }
     @media (min-width: 768px) {
       .wabi-glyph { width: 54px; height: 34px; }
       .wabi-glyph .dot { width: 17px; height: 17px; }
@@ -1226,7 +1238,7 @@
   </section>
 
   <!-- Orb Properties Panel -->
-  <div class="orb-panel" id="orbPanel">
+  <div class="orb-panel collapsed" id="orbPanel">
     <div class="orb-panel-header">
       <span class="orb-panel-title">Orb Properties</span>
       <button class="orb-panel-toggle" id="orbPanelToggle">
@@ -1348,6 +1360,14 @@
     const extreme = { refFactor: 2.5, refThickness: 60, refDispersion: 25, refFresnelRange: 80, refFresnelFactor: 80, refFresnelHardness: 60, blurRadius: 20, shadowFactor: 50, shadowExpand: 50, glareFactor: 60, glareRange: 80, glareAngle: 0, glareHardness: 50, glareConvergence: 80, glareOppositeFactor: 100, tintR: 200, tintG: 220, tintB: 255, tintA: 40, shadowPosX: 0, shadowPosY: -20, mergeRate: 0.1 };
 
     toggle.addEventListener('click', () => panel.classList.toggle('collapsed'));
+
+    // Toggle panel with "O" key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'o' || e.key === 'O') {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+        panel.classList.toggle('collapsed');
+      }
+    });
 
     // Show panel only when hero orb is in view
     const heroScroll = document.getElementById('heroOrbScroll');
