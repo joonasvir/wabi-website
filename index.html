@@ -816,11 +816,20 @@
       // Store current orb info for bubble spawning
       window._orbInfo = { x: window.innerWidth / 2, y: orbScreenY, diameter: diameter };
 
+      // Auto-spawn orbs when scroll sequence lands
+      if (progress > 0.92 && !window._orbsSpawned) {
+        window._orbsSpawned = true;
+        spawnLandingOrbs();
+      } else if (progress < 0.85) {
+        window._orbsSpawned = false;
+        clearLandingOrbs();
+      }
+
       requestAnimationFrame(animate);
     }
     requestAnimationFrame(animate);
 
-    // Bubble spawning on orb click — Wabi cover orbs fly out from behind the glass
+    // Wabi cover orbs — burst from plus button on scroll landing + click
     const HERO_BUBBLE_COVERS = [
       'https://i.imgur.com/4Aq1p5V.png','https://i.imgur.com/qx8f4iH.png','https://i.imgur.com/AWPO3TG.png',
       'https://i.imgur.com/p9lsZOd.png','https://i.imgur.com/vwH7fhY.png','https://i.imgur.com/LMjFvVQ.png',
@@ -828,7 +837,6 @@
       'https://i.imgur.com/D5A4UUJ.png','https://i.imgur.com/PFsPgBN.png','https://i.imgur.com/B70veGi.png',
       'https://i.imgur.com/AehAw57.png','https://i.imgur.com/rwgRwAj.png','https://i.imgur.com/ojY9Fs3.png',
     ];
-    // Preload cover images
     const heroBubbleImages = [];
     HERO_BUBBLE_COVERS.forEach(url => {
       const img = new Image();
@@ -838,18 +846,18 @@
     });
 
     const stickyEl = document.getElementById('heroOrbSticky');
+    let landingOrbEls = [];
 
-    function spawnBubbles() {
+    function spawnLandingOrbs() {
       const info = window._orbInfo;
       if (!info) return;
-      const count = 8 + Math.floor(Math.random() * 5);
+      const count = 25 + Math.floor(Math.random() * 10);
       for (let i = 0; i < count; i++) {
         const bubble = document.createElement('div');
         bubble.className = 'orb-bubble';
-        const size = 28 + Math.random() * 36;
+        const size = 30 + Math.random() * 60;
         bubble.style.width = size + 'px';
         bubble.style.height = size + 'px';
-        // Add cover image + overlay
         const cover = heroBubbleImages[Math.floor(Math.random() * heroBubbleImages.length)];
         const img = document.createElement('img');
         img.src = cover.url;
@@ -858,30 +866,81 @@
         const overlay = document.createElement('div');
         overlay.className = 'orb-bubble-overlay';
         bubble.appendChild(overlay);
-        // Start at orb center
+        bubble.style.left = (info.x - size / 2) + 'px';
+        bubble.style.top = (info.y - size / 2) + 'px';
+        bubble.style.opacity = '0';
+        stickyEl.appendChild(bubble);
+        landingOrbEls.push(bubble);
+
+        // Fan upward from the orb — biased heavily upward like a fountain
+        const spread = (Math.random() - 0.5) * 2; // -1 to 1
+        const driftX = spread * (120 + Math.random() * 180);
+        const driftY = -(100 + Math.random() * 350); // always upward
+        const endX = driftX + (Math.random() - 0.5) * 40;
+        const endY = driftY - Math.random() * 30;
+        const duration = 800 + Math.random() * 600;
+        const delay = i * 40 + Math.random() * 100;
+        bubble.animate([
+          { transform: 'translate(0, 0) scale(0)', opacity: 0 },
+          { transform: `translate(${driftX * 0.3}px, ${driftY * 0.3}px) scale(0.8)`, opacity: 1, offset: 0.3 },
+          { transform: `translate(${endX}px, ${endY}px) scale(1)`, opacity: 1 }
+        ], {
+          duration, delay, easing: 'cubic-bezier(0.16, 1, 0.3, 1)', fill: 'forwards'
+        });
+      }
+    }
+
+    function clearLandingOrbs() {
+      landingOrbEls.forEach(el => {
+        el.animate([
+          { opacity: 1 },
+          { opacity: 0 }
+        ], { duration: 300, fill: 'forwards' }).onfinish = () => el.remove();
+      });
+      landingOrbEls = [];
+    }
+
+    // Also spawn more on click
+    function spawnClickBurst() {
+      const info = window._orbInfo;
+      if (!info) return;
+      const count = 12 + Math.floor(Math.random() * 6);
+      for (let i = 0; i < count; i++) {
+        const bubble = document.createElement('div');
+        bubble.className = 'orb-bubble';
+        const size = 25 + Math.random() * 45;
+        bubble.style.width = size + 'px';
+        bubble.style.height = size + 'px';
+        const cover = heroBubbleImages[Math.floor(Math.random() * heroBubbleImages.length)];
+        const img = document.createElement('img');
+        img.src = cover.url;
+        img.crossOrigin = 'anonymous';
+        bubble.appendChild(img);
+        const overlay = document.createElement('div');
+        overlay.className = 'orb-bubble-overlay';
+        bubble.appendChild(overlay);
         bubble.style.left = (info.x - size / 2) + 'px';
         bubble.style.top = (info.y - size / 2) + 'px';
         bubble.style.opacity = '0';
         stickyEl.appendChild(bubble);
 
-        // Animate: burst outward in all directions from behind the glass orb
         const angle = Math.random() * Math.PI * 2;
-        const distance = 80 + Math.random() * 200;
+        const distance = 80 + Math.random() * 220;
         const driftX = Math.cos(angle) * distance;
-        const driftY = Math.sin(angle) * distance - 60; // bias upward
-        const duration = 1400 + Math.random() * 600;
+        const driftY = Math.sin(angle) * distance - 80;
+        const duration = 1200 + Math.random() * 600;
         const delay = Math.random() * 200;
         bubble.animate([
           { transform: 'translate(0, 0) scale(0)', opacity: 0 },
-          { transform: `translate(${driftX*0.2}px, ${driftY*0.2}px) scale(1)`, opacity: 1, offset: 0.2 },
-          { transform: `translate(${driftX}px, ${driftY}px) scale(0.7)`, opacity: 0 }
+          { transform: `translate(${driftX*0.3}px, ${driftY*0.3}px) scale(1)`, opacity: 1, offset: 0.25 },
+          { transform: `translate(${driftX}px, ${driftY}px) scale(0.6)`, opacity: 0 }
         ], {
           duration, delay, easing: 'cubic-bezier(0.16, 1, 0.3, 1)', fill: 'forwards'
         }).onfinish = () => bubble.remove();
       }
     }
 
-    landingOrb.addEventListener('click', spawnBubbles);
+    landingOrb.addEventListener('click', spawnClickBurst);
 
     window.addEventListener('resize', () => {
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
