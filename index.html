@@ -343,11 +343,11 @@
       box-shadow: 0 12px 48px rgba(0,0,0,0.15);
     }
     .create-card[data-pos="prev"] {
-      transform: translate(calc(-50% - 100px), -50%) rotateY(10deg) rotate(-8deg) scale(0.88);
+      transform: translate(calc(-50% - 100px), -50%) rotateY(-10deg) rotate(-8deg) scale(0.88);
       z-index: 1; opacity: 0.85; cursor: pointer;
     }
     .create-card[data-pos="next"] {
-      transform: translate(calc(-50% + 100px), -50%) rotateY(-10deg) rotate(8deg) scale(0.88);
+      transform: translate(calc(-50% + 100px), -50%) rotateY(10deg) rotate(8deg) scale(0.88);
       z-index: 2; opacity: 0.85; cursor: pointer;
     }
     .create-dots {
@@ -1014,9 +1014,9 @@
         });
       });
 
-      // Drag interaction: card follows mouse/touch with 3D tilt
+      // Drag interaction: card follows mouse/touch, moves to back of pile
       let dragStartX = 0, dragDx = 0, isDragging = false;
-      const SWIPE_THRESHOLD = 60;
+      const SWIPE_THRESHOLD = 80;
 
       function startDrag(x) {
         dragStartX = x; dragDx = 0; isDragging = true;
@@ -1028,9 +1028,16 @@
         if (!isDragging) return;
         dragDx = x - dragStartX;
         const activeCard = cards[active];
-        const rotY = -(dragDx / 15); // 3D tilt based on drag
-        const rot2d = dragDx / 40; // slight 2D rotation
-        activeCard.style.transform = `translate(calc(-50% + ${dragDx}px), -50%) rotateY(${Math.max(-15, Math.min(15, rotY))}deg) rotate(${Math.max(-6, Math.min(6, rot2d))}deg) scale(1)`;
+        // As card drags further, it shrinks + tilts like going to back of pile
+        const t = Math.min(1, Math.abs(dragDx) / 250); // 0→1 over 250px
+        const scale = 1 - t * 0.12; // 1 → 0.88
+        const opacity = 1 - t * 0.15; // 1 → 0.85
+        const rotY = (dragDx / 20); // tilt in drag direction
+        const rot2d = dragDx / 50;
+        const zIdx = t > 0.3 ? 0 : 3; // drop behind other cards past 30%
+        activeCard.style.transform = `translate(calc(-50% + ${dragDx}px), -50%) rotateY(${Math.max(-12, Math.min(12, rotY))}deg) rotate(${Math.max(-6, Math.min(6, rot2d))}deg) scale(${scale})`;
+        activeCard.style.opacity = opacity;
+        activeCard.style.zIndex = zIdx;
       }
 
       function endDrag() {
@@ -1039,6 +1046,8 @@
         const activeCard = cards[active];
         activeCard.classList.remove('dragging');
         activeCard.style.transform = '';
+        activeCard.style.opacity = '';
+        activeCard.style.zIndex = '';
         if (Math.abs(dragDx) > SWIPE_THRESHOLD) {
           dragDx < 0 ? goNext() : goPrev();
         }
