@@ -1891,19 +1891,24 @@
           });
         }
 
-        // Circle mode: spring force back to target positions
+        // Circle mode: steer orbs back toward target positions
         if (circleMode) {
           orbs.forEach(body => {
             const target = circleTargets.get(body.id);
             if (!target) return;
             const dx = target.x - body.position.x;
             const dy = target.y - body.position.y;
-            const springK = 0.0004;
-            const dampK = 0.04;
-            Matter.Body.applyForce(body, body.position, {
-              x: dx * springK - body.velocity.x * dampK * body.mass,
-              y: dy * springK - body.velocity.y * dampK * body.mass,
-            });
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            // Blend current velocity toward target; stronger when further away
+            const strength = Math.min(dist * 0.08, 8);
+            if (dist > 0.5) {
+              Matter.Body.setVelocity(body, {
+                x: body.velocity.x * 0.8 + (dx / dist) * strength,
+                y: body.velocity.y * 0.8 + (dy / dist) * strength,
+              });
+            } else {
+              Matter.Body.setVelocity(body, { x: body.velocity.x * 0.5, y: body.velocity.y * 0.5 });
+            }
           });
         }
 
