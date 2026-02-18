@@ -2,6 +2,6 @@
   "rewrites": [
     { "source": "/manifesto", "destination": "https://wabi-manifesto.vercel.app/manifesto" },
     { "source": "/manifesto/:path*", "destination": "https://wabi-manifesto.vercel.app/manifesto/:path*" },
-    { "source": "/((?!fonts|orb-overlay).*)", "destination": "/index.html" }
+    { "source": "/((?!fonts|orb-overlay|videos).*)", "destination": "/index.html" }
   ]
 }
