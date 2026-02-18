@@ -338,7 +338,7 @@
       position: relative; max-width: 900px; height: 860px;
       margin: 48px auto 0; cursor: grab; user-select: none;
       -webkit-user-select: none; perspective: 1200px;
-      transform: translateY(-100px);
+      transform: translateY(-200px);
     }
     .create-cards:active { cursor: grabbing; }
     .create-card {
@@ -380,6 +380,18 @@
       transition: background 0.3s, transform 0.3s;
     }
     .create-dot.active { background: #191919; transform: scale(1.2); }
+    /* Before fan-out: all cards stacked in center */
+    .create-cards:not(.fanned) .create-card[data-pos="prev"],
+    .create-cards:not(.fanned) .create-card[data-pos="next"] {
+      transform: translate(-50%, -50%) rotateY(0deg) rotate(0deg) scale(0.95);
+      opacity: 0.9;
+    }
+    /* Spring fan-out transition */
+    .create-cards.fanning .create-card {
+      transition: transform 1s cubic-bezier(0.34, 1.56, 0.64, 1),
+                  opacity 0.8s cubic-bezier(0.25, 1, 0.5, 1),
+                  box-shadow 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+    }
     @media (max-width: 640px) {
       .create-cards { height: 640px; }
       .create-card { width: 455px; height: 618px; }
@@ -1048,54 +1060,32 @@
       window.addEventListener('mousemove', e => moveDrag(e.clientX));
       window.addEventListener('mouseup', endDrag);
 
-      // Scroll-driven: cards slide down from -100px and fan out
-      let fanProgress = 0;
+      // Scroll: slide container down from -200px to 0
+      // Fan-out: triggered once with spring bounce when section enters view
+      let hasFanned = false;
       function updateCardScroll() {
         const rect = container.getBoundingClientRect();
         const vh = window.innerHeight;
+        // Slide progress: container moves from -200px to 0
         const rawT = 1 - (rect.top - vh * 0.3) / (vh * 0.7);
-        fanProgress = Math.max(0, Math.min(1, rawT));
-        const ease = fanProgress * fanProgress * (3 - 2 * fanProgress); // smoothstep
+        const t = Math.max(0, Math.min(1, rawT));
+        const ease = t * t * (3 - 2 * t);
+        container.style.transform = `translateY(${-200 + 200 * ease}px)`;
 
-        // Move cards container down from -100px to 0
-        container.style.transform = `translateY(${-100 + 100 * ease}px)`;
-
-        // Once fully fanned, clear inline styles so CSS transitions work for swaps
-        if (ease >= 0.99) {
-          cards.forEach(c => {
-            if (!c.classList.contains('dragging')) {
-              c.style.transform = '';
-              c.style.opacity = '';
-            }
-          });
-          return;
+        // Trigger spring fan-out once when section is ~40% in view
+        if (!hasFanned && t > 0.35) {
+          hasFanned = true;
+          container.classList.add('fanning');
+          container.classList.add('fanned');
+          // Remove fanning class after spring animation completes so normal transitions resume
+          setTimeout(() => container.classList.remove('fanning'), 1100);
         }
-
-        // Fan out prev/next cards smoothly during scroll
-        cards.forEach(c => {
-          if (isDragging && c === cards[active]) return;
-          const pos = c.getAttribute('data-pos');
-          if (pos === 'prev') {
-            const offsetX = -100 * ease;
-            const rot = -8 * ease;
-            const rotY = -10 * ease;
-            const s = 1 - 0.12 * ease;
-            c.style.transform = `translate(calc(-50% + ${offsetX}px), -50%) rotateY(${rotY}deg) rotate(${rot}deg) scale(${s})`;
-            c.style.opacity = 1 - 0.15 * ease;
-          } else if (pos === 'next') {
-            const offsetX = 100 * ease;
-            const rot = 8 * ease;
-            const rotY = 10 * ease;
-            const s = 1 - 0.12 * ease;
-            c.style.transform = `translate(calc(-50% + ${offsetX}px), -50%) rotateY(${rotY}deg) rotate(${rot}deg) scale(${s})`;
-            c.style.opacity = 1 - 0.15 * ease;
-          } else if (pos === 'active') {
-            if (!c.classList.contains('dragging')) {
-              c.style.transform = '';
-              c.style.opacity = '';
-            }
-          }
-        });
+        // Reset if scrolled back up
+        if (hasFanned && t < 0.1) {
+          hasFanned = false;
+          container.classList.remove('fanned');
+          container.classList.remove('fanning');
+        }
       }
       window.addEventListener('scroll', updateCardScroll, { passive: true });
       updateCardScroll();
