@@ -335,7 +335,7 @@
 
     /* ===== CREATE CARDS ===== */
     .create-cards {
-      position: relative; max-width: 900px; height: 860px;
+      position: relative; max-width: 900px; height: 690px;
       margin: 48px auto 0; cursor: grab; user-select: none;
       -webkit-user-select: none; perspective: 1200px;
       transform: translateY(-350px);
@@ -348,7 +348,7 @@
       transition: transform 0.5s cubic-bezier(0.25,1,0.5,1),
                   opacity 0.5s cubic-bezier(0.25,1,0.5,1),
                   box-shadow 0.5s cubic-bezier(0.25,1,0.5,1);
-      width: 591px; height: 803px;
+      width: 473px; height: 642px;
       transform-style: preserve-3d;
     }
     .create-card.dragging { transition: none; }
@@ -393,8 +393,8 @@
                   box-shadow 0.5s cubic-bezier(0.25, 1, 0.5, 1);
     }
     @media (max-width: 640px) {
-      .create-cards { height: 640px; }
-      .create-card { width: 455px; height: 618px; }
+      .create-cards { height: 512px; }
+      .create-card { width: 364px; height: 494px; }
       .create-card[data-pos="prev"] { transform: translate(calc(-50% - 60px), -50%) rotate(-8deg) scale(0.85); }
       .create-card[data-pos="next"] { transform: translate(calc(-50% + 60px), -50%) rotate(8deg) scale(0.85); }
     }
@@ -480,7 +480,7 @@
         inset 0 1px 0 rgba(255,255,255,0.9),
         inset 0 -1px 2px rgba(0,0,0,0.04);
       display: flex; flex-direction: column; align-items: center;
-      justify-content: center; gap: 12px; padding: 20px 20px 18px;
+      justify-content: center; gap: 20px; padding: 20px 20px 18px;
     }
     .discover-card:hover {
       box-shadow: 0 8px 32px rgba(0,0,0,0.1),
@@ -501,7 +501,7 @@
       pointer-events: none; z-index: 1;
     }
     .discover-card-name {
-      font-size: 16px; font-weight: 500; color: #7a3b2e;
+      font-size: 24px; font-weight: 500; color: #7a3b2e;
       letter-spacing: -0.02em; text-align: center;
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
       width: 100%;
@@ -1706,6 +1706,36 @@
       });
       container.addEventListener('mouseleave', () => {
         mousePos.x = -9999; mousePos.y = -9999;
+      });
+
+      // Click/tap to drop new bubbles at that position
+      container.addEventListener('click', (e) => {
+        const r = getRect();
+        const clickX = e.clientX - r.left;
+        const clickY = e.clientY - r.top;
+        const count = 3 + Math.floor(Math.random() * 4); // 3-6 bubbles per click
+        for (let i = 0; i < count; i++) {
+          const scale = MIN_SCALE + Math.random() * (MAX_SCALE - MIN_SCALE);
+          const radius = BASE_RADIUS * scale;
+          const posX = clickX + (Math.random() - 0.5) * 60;
+          const posY = clickY + (Math.random() - 0.5) * 40;
+          const imageUrl = getRandomCover();
+          const orb = Matter.Bodies.circle(posX, posY, radius, {
+            restitution: 0.6, friction: 0.05, frictionAir: DAMPING,
+            density: 0.001, label: 'orb', slop: 0.01,
+          });
+          // Give a small random upward impulse
+          Matter.Body.setVelocity(orb, { x: (Math.random() - 0.5) * 4, y: -(2 + Math.random() * 4) });
+          const data = { imageUrl, image: preloadedImages.get(imageUrl) || null };
+          if (!data.image) {
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.onload = () => { data.image = img; preloadedImages.set(imageUrl, img); };
+            img.src = imageUrl;
+          }
+          orbDataMap.set(orb.id, data);
+          Matter.Composite.add(engine.world, orb);
+        }
       });
 
       function render() {
