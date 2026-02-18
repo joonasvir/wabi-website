@@ -963,7 +963,7 @@
         <video muted loop playsinline preload="auto"><source src="/videos/create-onboarding-1.mp4" type="video/mp4"></video>
       </div>
       <div class="create-card" data-pos="active">
-        <video autoplay muted loop playsinline><source src="/videos/create-onboarding-2.mp4" type="video/mp4"></video>
+        <video muted loop playsinline preload="auto"><source src="/videos/create-onboarding-2.mp4" type="video/mp4"></video>
       </div>
       <div class="create-card" data-pos="next">
         <video muted loop playsinline preload="auto"><source src="/videos/create-onboarding-3.mp4" type="video/mp4"></video>
@@ -994,9 +994,27 @@
         cards[active].setAttribute('data-pos', 'active');
         cards[next].setAttribute('data-pos', 'next');
         const activeVid = cards[active].querySelector('video');
-        if (activeVid) activeVid.play();
+        if (activeVid && cardsInView) activeVid.play();
         dots.forEach((d, i) => d.classList.toggle('active', i === active));
       }
+
+      // Only play videos when scrolled 50% into card stack
+      let cardsInView = false;
+      function checkCardsInView() {
+        const rect = container.getBoundingClientRect();
+        const vh = window.innerHeight;
+        const mid = rect.top + rect.height / 2;
+        const wasInView = cardsInView;
+        cardsInView = mid < vh * 0.75 && mid > vh * 0.1;
+        if (cardsInView && !wasInView) {
+          const vid = cards[active].querySelector('video');
+          if (vid) vid.play();
+        } else if (!cardsInView && wasInView) {
+          cards.forEach(c => { const v = c.querySelector('video'); if (v) v.pause(); });
+        }
+      }
+      window.addEventListener('scroll', checkCardsInView, { passive: true });
+      checkCardsInView();
 
       function goNext() { active = (active + 1) % cards.length; update(); }
       function goPrev() { active = (active - 1 + cards.length) % cards.length; update(); }
