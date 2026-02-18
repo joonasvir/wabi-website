@@ -1,7 +1,6 @@
 {
   "rewrites": [
-    { "source": "/manifesto", "destination": "https://wabi-manifesto.vercel.app/manifesto" },
-    { "source": "/manifesto/:path*", "destination": "https://wabi-manifesto.vercel.app/manifesto/:path*" },
-    { "source": "/((?!fonts|orb-overlay|orb-glass-overlay|videos|liquid-glass|bubble1).*)", "destination": "/index.html" }
+    { "source": "/manifesto", "destination": "/manifesto.html" },
+    { "source": "/((?!fonts|orb-overlay|orb-glass-overlay|videos|liquid-glass|bubble1|manifesto).*)", "destination": "/index.html" }
   ]
 }
