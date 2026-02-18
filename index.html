@@ -794,8 +794,9 @@
       targetProgress = Math.max(0, Math.min(1, -rect.top / totalScroll));
       progress += (targetProgress - progress) * 0.08;
 
-      // Dark-to-light transition
-      const bgVal = Math.round(17 + progress * (240 - 17));
+      // Dark-to-light transition (eased to shift earlier in scroll)
+      const bgEase = Math.pow(progress, 0.65);
+      const bgVal = Math.round(17 + bgEase * (240 - 17));
       document.body.style.backgroundColor = `rgb(${bgVal},${bgVal},${bgVal})`;
       // Hero text: white → dark
       const textVal = Math.round(255 - progress * (255 - 25));
