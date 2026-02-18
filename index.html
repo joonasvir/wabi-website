@@ -654,12 +654,15 @@
       bgCtx.fillStyle = `rgb(${bgVal},${bgVal},${bgVal})`;
       bgCtx.fillRect(0, 0, w, h);
 
-      // Blue line at very bottom edge — refraction pulls it into view
-      bgCtx.save();
-      bgCtx.globalAlpha = 0.01;
-      bgCtx.fillStyle = '#4488ff';
-      bgCtx.fillRect(0, h - 2, w, 2);
-      bgCtx.restore();
+      // Blue line at very bottom edge — refraction pulls it into view, fades out by 50%
+      const blueLineAlpha = Math.max(0, 1 - progress / 0.5);
+      if (blueLineAlpha > 0.001) {
+        bgCtx.save();
+        bgCtx.globalAlpha = blueLineAlpha;
+        bgCtx.fillStyle = '#4488ff';
+        bgCtx.fillRect(0, h - 2, w, 2);
+        bgCtx.restore();
+      }
 
       // "Meet Wabi." bg text: fade in + slide up from below (matches HTML content-2)
       const meetOpacity = smoothstep(0.25, 0.5, progress);
