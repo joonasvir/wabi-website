@@ -495,7 +495,7 @@
       perspective: 1200px; overflow: visible;
       cursor: grab; display: flex; align-items: center; justify-content: center;
       opacity: 0; transform: translateY(40px);
-      transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+      transition: opacity 1.4s ease, transform 1.4s cubic-bezier(0.25, 1, 0.5, 1);
     }
     .discover-gallery.visible {
       opacity: 1; transform: translateY(0);
@@ -1233,7 +1233,7 @@
         gallery.classList.add('visible');
         galleryObserver.disconnect();
       }
-    }, { threshold: 0.15 });
+    }, { threshold: 0.02 });
     galleryObserver.observe(gallery);
     const AUTO_SPEED = 0.3;
 
