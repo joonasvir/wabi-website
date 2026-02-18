@@ -298,7 +298,7 @@
       filter: drop-shadow(0 1px 2px rgba(0,0,0,0.25));
     }
     .orb-bubble {
-      position: absolute; z-index: 3; pointer-events: none;
+      position: absolute; z-index: 10; pointer-events: none;
       will-change: transform, opacity;
     }
     .orb-bubble img {
@@ -338,6 +338,7 @@
       position: relative; max-width: 900px; height: 860px;
       margin: 48px auto 0; cursor: grab; user-select: none;
       -webkit-user-select: none; perspective: 1200px;
+      transform: translateY(-100px);
     }
     .create-cards:active { cursor: grabbing; }
     .create-card {
@@ -553,6 +554,7 @@
     .orb-footer-section {
       position: relative; width: 100%; min-height: 100vh; overflow: hidden;
       background: #111;
+      display: flex; flex-direction: column;
     }
     .orb-footer-section canvas {
       position: absolute; top: 0; left: 0; width: 100%; height: 100%;
@@ -560,6 +562,7 @@
     }
     .orb-footer-section .cta-section {
       position: relative; z-index: 2;
+      flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
     }
     .orb-footer-section .cta-heading { color: #f0f0f0; }
     .orb-footer-section .section-sub { color: rgba(255,255,255,0.5); }
@@ -571,11 +574,13 @@
     .orb-footer-section .hero-input-wrap input::placeholder { color: rgba(255,255,255,0.35); }
     .orb-footer-section footer {
       position: relative; z-index: 2; border-top-color: rgba(255,255,255,0.1);
+      margin-top: auto; flex-shrink: 0;
     }
     .orb-footer-section .footer-glyph .dot { background: #f0f0f0; }
     .orb-footer-section .footer-wordmark { color: #f0f0f0; }
     .orb-footer-section .footer-links a { color: rgba(255,255,255,0.4); }
     .orb-footer-section .footer-links a:hover { color: #f0f0f0; }
+    .orb-footer-section .glass-btn span { color: #f0f0f0 !important; }
     @media (max-width: 640px) {
       .section-heading { font-size: 32px; line-height: 38px; }
       .hero-content-1 .section-heading { font-size: 42px; line-height: 50px; }
@@ -1042,6 +1047,58 @@
       });
       window.addEventListener('mousemove', e => moveDrag(e.clientX));
       window.addEventListener('mouseup', endDrag);
+
+      // Scroll-driven: cards slide down from -100px and fan out
+      let fanProgress = 0;
+      function updateCardScroll() {
+        const rect = container.getBoundingClientRect();
+        const vh = window.innerHeight;
+        const rawT = 1 - (rect.top - vh * 0.3) / (vh * 0.7);
+        fanProgress = Math.max(0, Math.min(1, rawT));
+        const ease = fanProgress * fanProgress * (3 - 2 * fanProgress); // smoothstep
+
+        // Move cards container down from -100px to 0
+        container.style.transform = `translateY(${-100 + 100 * ease}px)`;
+
+        // Once fully fanned, clear inline styles so CSS transitions work for swaps
+        if (ease >= 0.99) {
+          cards.forEach(c => {
+            if (!c.classList.contains('dragging')) {
+              c.style.transform = '';
+              c.style.opacity = '';
+            }
+          });
+          return;
+        }
+
+        // Fan out prev/next cards smoothly during scroll
+        cards.forEach(c => {
+          if (isDragging && c === cards[active]) return;
+          const pos = c.getAttribute('data-pos');
+          if (pos === 'prev') {
+            const offsetX = -100 * ease;
+            const rot = -8 * ease;
+            const rotY = -10 * ease;
+            const s = 1 - 0.12 * ease;
+            c.style.transform = `translate(calc(-50% + ${offsetX}px), -50%) rotateY(${rotY}deg) rotate(${rot}deg) scale(${s})`;
+            c.style.opacity = 1 - 0.15 * ease;
+          } else if (pos === 'next') {
+            const offsetX = 100 * ease;
+            const rot = 8 * ease;
+            const rotY = 10 * ease;
+            const s = 1 - 0.12 * ease;
+            c.style.transform = `translate(calc(-50% + ${offsetX}px), -50%) rotateY(${rotY}deg) rotate(${rot}deg) scale(${s})`;
+            c.style.opacity = 1 - 0.15 * ease;
+          } else if (pos === 'active') {
+            if (!c.classList.contains('dragging')) {
+              c.style.transform = '';
+              c.style.opacity = '';
+            }
+          }
+        });
+      }
+      window.addEventListener('scroll', updateCardScroll, { passive: true });
+      updateCardScroll();
     })();
     </script>
   </section>
