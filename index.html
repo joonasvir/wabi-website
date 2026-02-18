@@ -297,6 +297,37 @@
       transform: translate(-50%, -50%) scale(1.02);
       filter: drop-shadow(0 1px 2px rgba(0,0,0,0.25));
     }
+    .orb-input {
+      position: absolute; opacity: 0; pointer-events: none;
+      border: none; outline: none; background: transparent;
+      font-family: 'Selecta', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 16px; color: #191919; width: 100%; text-align: center;
+      letter-spacing: -0.02em;
+      transition: opacity 0.35s ease;
+    }
+    .orb-input::placeholder { color: #999; }
+    .hero-landing-orb.expanded {
+      width: 340px !important; height: 52px !important;
+      border-radius: 26px !important;
+      background: #fff !important;
+      border: 1.5px solid rgba(0,0,0,0.12) !important;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1), 0 2px 8px rgba(0,0,0,0.06) !important;
+      filter: none !important;
+      transition: width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
+                  height 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
+                  border-radius 0.4s ease,
+                  background 0.3s ease,
+                  box-shadow 0.4s ease,
+                  filter 0.3s ease !important;
+      cursor: text;
+    }
+    .hero-landing-orb.expanded svg { opacity: 0; transition: opacity 0.2s ease; pointer-events: none; }
+    .hero-landing-orb.expanded .orb-input {
+      opacity: 1; pointer-events: auto;
+    }
+    @media (max-width: 640px) {
+      .hero-landing-orb.expanded { width: 280px !important; }
+    }
     .orb-bubble {
       position: absolute; z-index: 5; pointer-events: none;
       will-change: transform, opacity;
@@ -460,14 +491,14 @@
     /* ===== DISCOVER GALLERY ===== */
     .discover-gallery {
       position: relative; width: 100vw; height: 55vh; min-height: 420px;
-      margin: -10px calc(-50vw + 50%) 0;
+      margin: -60px calc(-50vw + 50%) 0;
+      perspective: 1200px; overflow: visible;
+      cursor: grab; display: flex; align-items: center; justify-content: center;
       opacity: 0; transform: translateY(40px);
       transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
     }
     .discover-gallery.visible {
       opacity: 1; transform: translateY(0);
-      perspective: 1200px; overflow: visible;
-      cursor: grab; display: flex; align-items: center; justify-content: center;
     }
     .discover-gallery:active { cursor: grabbing; }
     .discover-strip {
@@ -476,19 +507,19 @@
     }
     .discover-card {
       position: absolute; top: 50%; left: 50%;
-      width: 286px; height: 312px;
-      margin-left: -143px; margin-top: -156px;
+      width: 286px; height: 340px;
+      margin-left: -143px; margin-top: -170px;
       border-radius: 24px; overflow: hidden;
       transform-style: preserve-3d; will-change: transform, opacity;
       background: rgba(255,255,255,0.85);
-      box-shadow: 0 16px 48px rgba(0,0,0,0.12), 0 4px 16px rgba(0,0,0,0.06),
+      box-shadow: 0 44px 120px rgba(0,0,0,0.056), 0 14px 40px rgba(0,0,0,0.028),
         inset 0 1px 0 rgba(255,255,255,0.9),
         inset 0 -1px 2px rgba(0,0,0,0.04);
       display: flex; flex-direction: column; align-items: center;
-      justify-content: center; gap: 20px; padding: 24px 20px 24px;
+      justify-content: center; gap: 32px; padding: 24px 20px 24px;
     }
     .discover-card:hover {
-      box-shadow: 0 24px 64px rgba(0,0,0,0.16), 0 8px 24px rgba(0,0,0,0.08),
+      box-shadow: 0 54px 150px rgba(0,0,0,0.077), 0 18px 48px rgba(0,0,0,0.035),
         inset 0 1px 0 rgba(255,255,255,0.9),
         inset 0 -1px 2px rgba(0,0,0,0.04);
     }
@@ -575,12 +606,14 @@
     }
     .orb-footer-section canvas {
       position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-      touch-action: pan-y;
+      z-index: 1; touch-action: pan-y;
     }
     .orb-footer-section .cta-section {
-      position: relative; z-index: 2;
+      position: relative; z-index: 2; pointer-events: none;
       flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
     }
+    .orb-footer-section .cta-section .glass-btn-wrap,
+    .orb-footer-section .cta-section a { pointer-events: auto; }
     .orb-footer-section .cta-heading { color: #f0f0f0; }
     .orb-footer-section .section-sub { color: rgba(255,255,255,0.5); }
     .orb-footer-section .hero-input-wrap {
@@ -591,8 +624,9 @@
     .orb-footer-section .hero-input-wrap input::placeholder { color: rgba(255,255,255,0.35); }
     .orb-footer-section footer {
       position: relative; z-index: 2; border-top-color: rgba(255,255,255,0.1);
-      margin-top: auto; flex-shrink: 0;
+      margin-top: auto; flex-shrink: 0; pointer-events: none;
     }
+    .orb-footer-section footer a { pointer-events: auto; }
     .orb-footer-section .footer-glyph .dot { background: #f0f0f0; }
     .orb-footer-section .footer-wordmark { color: #f0f0f0; }
     .orb-footer-section .footer-links a { color: rgba(255,255,255,0.4); }
@@ -663,6 +697,7 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
           <line x1="12" y1="6" x2="12" y2="18"/><line x1="6" y1="12" x2="18" y2="12"/>
         </svg>
+        <input type="text" class="orb-input" id="orbInput" placeholder="What do you want to create?" />
       </div>
     </div>
   </div>
@@ -844,13 +879,15 @@
       landingOrb.style.left = '50%';
       const orbScreenY = window.innerHeight / 2 - posY;
       landingOrb.style.top = orbScreenY + 'px';
-      landingOrb.style.width = diameter + 'px';
-      landingOrb.style.height = diameter + 'px';
-      // Scale icon proportionally to orb (40% of diameter, min 32px)
-      const iconSize = Math.max(32, diameter * 0.4);
-      const svg = landingOrb.querySelector('svg');
-      svg.style.width = iconSize + 'px';
-      svg.style.height = iconSize + 'px';
+      if (!orbExpanded) {
+        landingOrb.style.width = diameter + 'px';
+        landingOrb.style.height = diameter + 'px';
+        // Scale icon proportionally to orb (40% of diameter, min 32px)
+        const iconSize = Math.max(32, diameter * 0.4);
+        const svg = landingOrb.querySelector('svg');
+        svg.style.width = iconSize + 'px';
+        svg.style.height = iconSize + 'px';
+      }
 
       // Position the PNG glass overlay to match the orb
       // Opacity: 10% at start, increases to 100% by end of scroll
@@ -947,9 +984,16 @@
       landingOrbEls = [];
     }
 
-    landingOrb.addEventListener('click', () => {
+    const orbInput = document.getElementById('orbInput');
+    let orbExpanded = false;
+
+    landingOrb.addEventListener('click', (e) => {
+      if (orbExpanded) return;
+      e.stopPropagation();
       const info = window._orbInfo;
       if (!info) return;
+
+      // Spawn bubbles first
       for (let i = 0; i < 12; i++) {
         spawnFloatingBubble(info, {
           size: 27 + Math.random() * 53,
@@ -958,7 +1002,26 @@
           track: false
         });
       }
+
+      // Expand into input field
+      orbExpanded = true;
+      landingOrb.classList.add('expanded');
+      setTimeout(() => orbInput.focus(), 400);
     });
+
+    // Collapse on Escape or click outside
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && orbExpanded) collapseOrb();
+    });
+    document.addEventListener('click', (e) => {
+      if (orbExpanded && !landingOrb.contains(e.target)) collapseOrb();
+    });
+    function collapseOrb() {
+      orbExpanded = false;
+      orbInput.blur();
+      orbInput.value = '';
+      landingOrb.classList.remove('expanded');
+    }
 
     window.addEventListener('resize', () => {
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -1164,9 +1227,12 @@
     const strip = document.getElementById('discoverStrip');
     const CARD_WIDTH = 312;
 
-    // Smooth appear on scroll
+    let galleryReady = false;
     const galleryObserver = new IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting) { gallery.classList.add('visible'); galleryObserver.disconnect(); }
+      if (entries[0].isIntersecting && galleryReady) {
+        gallery.classList.add('visible');
+        galleryObserver.disconnect();
+      }
     }, { threshold: 0.15 });
     galleryObserver.observe(gallery);
     const AUTO_SPEED = 0.3;
@@ -1203,6 +1269,14 @@
       covers = FALLBACK_COVERS;
     }
 
+    function preloadImages(urls) {
+      return Promise.all(urls.map(url => new Promise(resolve => {
+        const img = new Image();
+        img.onload = resolve; img.onerror = resolve;
+        img.src = url;
+      })));
+    }
+
     function shuffle(arr) {
       const a = [...arr];
       for (let i = a.length - 1; i > 0; i--) {
@@ -1224,7 +1298,7 @@
         const orb = document.createElement('div');
         orb.className = 'discover-orb';
         const img = document.createElement('img');
-        img.src = url; img.loading = 'lazy'; img.draggable = false;
+        img.src = url; img.draggable = false;
         orb.appendChild(img);
         const glass = document.createElement('img');
         glass.className = 'orb-glass';
@@ -1279,7 +1353,15 @@
 
     async function init() {
       await loadCovers();
+      await preloadImages(covers);
       buildCards();
+      galleryReady = true;
+      // Check if already in view
+      const rect = gallery.getBoundingClientRect();
+      if (rect.top < window.innerHeight * 0.85) {
+        gallery.classList.add('visible');
+        galleryObserver.disconnect();
+      }
 
       // Mouse drag
       gallery.addEventListener('mousedown', e => {
@@ -1618,7 +1700,7 @@
       'https://i.imgur.com/etdgUOx.png','https://i.imgur.com/6LgF0YR.png','https://i.imgur.com/7MqgR3i.png',
       'https://i.imgur.com/txHoBrO.png','https://i.imgur.com/iV88FY2.png','https://i.imgur.com/FAoVMHq.png',
     ];
-    const BASE_RADIUS = 42;
+    const BASE_RADIUS = 50;
     const MIN_SCALE = 0.9;
     const MAX_SCALE = 1.1;
     const DAMPING = 0.005;
@@ -1705,7 +1787,7 @@
       const ctx = canvas.getContext('2d');
       ctx.scale(dpr, dpr);
 
-      engine = Matter.Engine.create({ gravity: { x: 0, y: 1 }, enableSleeping: false });
+      engine = Matter.Engine.create({ gravity: { x: 0, y: 0.8 }, enableSleeping: false });
       engine.positionIterations = 6;
       engine.velocityIterations = 4;
 
@@ -1830,6 +1912,16 @@
       window.addEventListener('resize', handleResize);
 
       // Control buttons
+      let circleMode = false;
+      function restoreGravity() {
+        if (circleMode) {
+          circleMode = false;
+          engine.gravity.y = 0.8;
+          const orbs = Matter.Composite.allBodies(engine.world).filter(b => b.label === 'orb');
+          orbs.forEach(body => { Matter.Body.setStatic(body, false); });
+        }
+      }
+
       document.getElementById('orbCircleBtn').addEventListener('click', (e) => {
         e.stopPropagation();
         const rect = getRect();
@@ -1837,17 +1929,21 @@
         const cy = rect.height * 0.4;
         const orbs = Matter.Composite.allBodies(engine.world).filter(b => b.label === 'orb');
         const radius = Math.min(rect.width, rect.height) * 0.32;
+        circleMode = true;
+        engine.gravity.y = 0;
         orbs.forEach((body, i) => {
           const angle = (i / orbs.length) * Math.PI * 2 - Math.PI / 2;
           const tx = cx + Math.cos(angle) * radius;
           const ty = cy + Math.sin(angle) * radius;
           Matter.Body.setVelocity(body, { x: 0, y: 0 });
           Matter.Body.setPosition(body, { x: tx, y: ty });
+          Matter.Body.setStatic(body, true);
         });
       });
 
       document.getElementById('orbShakeBtn').addEventListener('click', (e) => {
         e.stopPropagation();
+        restoreGravity();
         const orbs = Matter.Composite.allBodies(engine.world).filter(b => b.label === 'orb');
         orbs.forEach(body => {
           Matter.Body.setVelocity(body, {
@@ -1859,6 +1955,7 @@
 
       document.getElementById('orbDropBtn').addEventListener('click', (e) => {
         e.stopPropagation();
+        restoreGravity();
         for (let i = 0; i < 8; i++) {
           setTimeout(() => addOrb(), i * 50);
         }
