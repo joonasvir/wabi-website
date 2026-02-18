@@ -248,37 +248,53 @@
 
     /* ===== CREATE CARDS ===== */
     .create-cards {
-      display: flex; justify-content: center; align-items: center;
-      margin-top: 48px; position: relative; max-width: 600px;
-      margin-left: auto; margin-right: auto; height: 420px;
+      position: relative; max-width: 600px; height: 420px;
+      margin: 48px auto 0; cursor: grab; user-select: none;
+      -webkit-user-select: none;
     }
+    .create-cards:active { cursor: grabbing; }
     .create-card {
       position: absolute; border-radius: 24px; overflow: hidden;
       box-shadow: 0 8px 40px rgba(0,0,0,0.12);
+      left: 50%; top: 50%;
+      transition: transform 0.5s cubic-bezier(0.25,1,0.5,1),
+                  opacity 0.5s cubic-bezier(0.25,1,0.5,1),
+                  box-shadow 0.5s cubic-bezier(0.25,1,0.5,1);
+      width: 280px; height: 380px;
     }
     .create-card video {
       display: block; width: 100%; height: 100%; object-fit: cover;
+      pointer-events: none;
     }
-    .create-card-1 {
-      width: 240px; height: 360px; z-index: 1;
-      transform: translateX(-40px) rotate(-3deg);
-      border-radius: 28px; background: #111;
-      border: 4px solid #222;
+    /* States: active (front), prev (left behind), next (right behind) */
+    .create-card[data-pos="active"] {
+      transform: translate(-50%, -50%) rotate(0deg) scale(1);
+      z-index: 3; opacity: 1;
+      box-shadow: 0 12px 48px rgba(0,0,0,0.15);
     }
-    .create-card-2 {
-      width: 300px; height: 380px; z-index: 3;
-      border-radius: 24px;
+    .create-card[data-pos="prev"] {
+      transform: translate(calc(-50% - 50px), -50%) rotate(-5deg) scale(0.9);
+      z-index: 1; opacity: 0.85;
     }
-    .create-card-3 {
-      width: 240px; height: 360px; z-index: 2;
-      transform: translateX(40px) rotate(3deg);
-      border-radius: 24px;
+    .create-card[data-pos="next"] {
+      transform: translate(calc(-50% + 50px), -50%) rotate(5deg) scale(0.9);
+      z-index: 2; opacity: 0.85;
     }
+    .create-dots {
+      display: flex; justify-content: center; gap: 8px;
+      margin-top: 20px;
+    }
+    .create-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: #d4d4d4; border: none; padding: 0; cursor: pointer;
+      transition: background 0.3s, transform 0.3s;
+    }
+    .create-dot.active { background: #191919; transform: scale(1.2); }
     @media (max-width: 640px) {
       .create-cards { height: 320px; }
-      .create-card-1 { width: 180px; height: 270px; transform: translateX(-30px) rotate(-3deg); }
-      .create-card-2 { width: 220px; height: 290px; }
-      .create-card-3 { width: 180px; height: 270px; transform: translateX(30px) rotate(3deg); }
+      .create-card { width: 220px; height: 300px; }
+      .create-card[data-pos="prev"] { transform: translate(calc(-50% - 35px), -50%) rotate(-5deg) scale(0.88); }
+      .create-card[data-pos="next"] { transform: translate(calc(-50% + 35px), -50%) rotate(5deg) scale(0.88); }
     }
 
     /* ===== CATEGORY PILLS ===== */
@@ -408,17 +424,84 @@
     <span class="section-badge">Create</span>
     <h2 class="section-heading">Create anything</h2>
     <p class="section-sub">Go from idea to app in a snap. That thing you wished existed? Make it.</p>
-    <div class="create-cards">
-      <div class="create-card create-card-1">
+    <div class="create-cards" id="createCards">
+      <div class="create-card" data-pos="prev">
         <video autoplay muted loop playsinline><source src="/videos/create-onboarding-1.mp4" type="video/mp4"></video>
       </div>
-      <div class="create-card create-card-2">
+      <div class="create-card" data-pos="active">
         <video autoplay muted loop playsinline><source src="/videos/create-onboarding-2.mp4" type="video/mp4"></video>
       </div>
-      <div class="create-card create-card-3">
+      <div class="create-card" data-pos="next">
         <video autoplay muted loop playsinline><source src="/videos/create-onboarding-3.mp4" type="video/mp4"></video>
       </div>
     </div>
+    <div class="create-dots" id="createDots">
+      <button class="create-dot" data-idx="0"></button>
+      <button class="create-dot active" data-idx="1"></button>
+      <button class="create-dot" data-idx="2"></button>
+    </div>
+    <script>
+    (function() {
+      const container = document.getElementById('createCards');
+      const cards = Array.from(container.querySelectorAll('.create-card'));
+      const dots = Array.from(document.getElementById('createDots').querySelectorAll('.create-dot'));
+      let active = 1;
+      const positions = ['prev', 'active', 'next'];
+
+      function update() {
+        const prev = (active - 1 + cards.length) % cards.length;
+        const next = (active + 1) % cards.length;
+        cards.forEach(c => c.setAttribute('data-pos', 'next'));
+        cards[prev].setAttribute('data-pos', 'prev');
+        cards[active].setAttribute('data-pos', 'active');
+        cards[next].setAttribute('data-pos', 'next');
+        dots.forEach((d, i) => d.classList.toggle('active', i === active));
+      }
+
+      function goNext() { active = (active + 1) % cards.length; update(); }
+      function goPrev() { active = (active - 1 + cards.length) % cards.length; update(); }
+      function goTo(i) { active = i; update(); }
+
+      // Dot clicks
+      dots.forEach(d => d.addEventListener('click', () => goTo(parseInt(d.dataset.idx))));
+
+      // Touch swipe
+      let startX = 0, startY = 0, dragging = false, moved = false;
+      container.addEventListener('touchstart', e => {
+        startX = e.touches[0].clientX; startY = e.touches[0].clientY;
+        dragging = true; moved = false;
+      }, { passive: true });
+      container.addEventListener('touchmove', e => {
+        if (!dragging) return;
+        const dx = e.touches[0].clientX - startX;
+        const dy = e.touches[0].clientY - startY;
+        if (Math.abs(dx) > 20 && Math.abs(dx) > Math.abs(dy)) moved = true;
+      }, { passive: true });
+      container.addEventListener('touchend', e => {
+        if (!dragging) return;
+        dragging = false;
+        const dx = e.changedTouches[0].clientX - startX;
+        if (Math.abs(dx) > 40 && moved) { dx < 0 ? goNext() : goPrev(); }
+      });
+
+      // Mouse drag
+      let mStartX = 0, mDragging = false, mMoved = false;
+      container.addEventListener('mousedown', e => {
+        mStartX = e.clientX; mDragging = true; mMoved = false;
+        e.preventDefault();
+      });
+      window.addEventListener('mousemove', e => {
+        if (!mDragging) return;
+        if (Math.abs(e.clientX - mStartX) > 15) mMoved = true;
+      });
+      window.addEventListener('mouseup', e => {
+        if (!mDragging) return;
+        mDragging = false;
+        const dx = e.clientX - mStartX;
+        if (Math.abs(dx) > 40 && mMoved) { dx < 0 ? goNext() : goPrev(); }
+      });
+    })();
+    </script>
   </section>
 
   <!-- Discover -->
