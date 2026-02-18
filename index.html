@@ -4,18 +4,19 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Wabi — The first personal software platform</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.20.0/matter.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.20.0/matter.min.js" defer></script>
   <style>
     @font-face { font-family: 'Selecta'; src: url('/fonts/Selecta-Regular.otf') format('opentype'); font-weight: 400; font-style: normal; font-display: swap; }
     @font-face { font-family: 'Selecta'; src: url('/fonts/Selecta-Medium.otf') format('opentype'); font-weight: 500; font-style: normal; font-display: swap; }
     @font-face { font-family: 'Selecta'; src: url('/fonts/Selecta-Bold.otf') format('opentype'); font-weight: 700; font-style: normal; font-display: swap; }
+    @font-face { font-family: 'Kalice'; src: url('/fonts/Kalice-Trial-Regular.woff2') format('woff2'); font-weight: 400; font-style: normal; font-display: swap; }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       font-family: 'Selecta', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
       color: #191919;
-      background: #f0f0f0;
+      background: #111;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
     }
@@ -26,11 +27,8 @@
       align-items: center;
       justify-content: space-between;
       padding: 24px 24px;
-      position: sticky;
-      top: 0;
-      background: rgba(240,240,240,0.85);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+      position: fixed;
+      top: 0; left: 0; right: 0;
       z-index: 100;
     }
     @media (min-width: 768px) { nav { padding: 32px 32px; } }
@@ -55,7 +53,7 @@
       .wabi-glyph .dot:nth-child(5) { top: 15px; left: 27px; }
     }
 
-    .nav-right { display: flex; align-items: center; gap: 16px; }
+    .nav-right { display: flex; align-items: center; gap: 36px; }
 
     .nav-link {
       color: #525252;
@@ -159,7 +157,7 @@
     /* Nav header variant */
     .glass-btn-wrap--header { width: 126px; }
     .glass-btn-wrap--header .glass-btn { width: 126px; height: 40px; }
-    .glass-btn-wrap--header .glass-btn span { font-size: 14px; font-weight: 400; letter-spacing: -0.16px; mix-blend-mode: luminosity; color: #363636; }
+    .glass-btn-wrap--header .glass-btn span { font-size: 14px; font-weight: 400; letter-spacing: -0.16px; color: #363636; }
     @media (min-width: 768px) {
       .glass-btn-wrap--header { width: 145px; }
       .glass-btn-wrap--header .glass-btn { width: 145px; height: 46px; }
@@ -243,38 +241,86 @@
       .hero-form { flex-direction: row; justify-content: center; gap: 12px; }
     }
 
-    /* ===== MEET WABI ===== */
-    .meet-wabi { padding: 120px 24px 80px; }
-
+    /* ===== HERO ORB SCROLL ===== */
+    .hero-orb-scroll { position: relative; height: 105vh; }
+    .hero-orb-sticky {
+      position: sticky; top: 0; height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+    .hero-content-1, .hero-content-2 {
+      position: absolute; width: 100%; text-align: center;
+      padding: 0 24px; will-change: opacity, transform;
+    }
+    .hero-content-1 { top: calc(28% + 180px); transform: translateY(-50%); z-index: 7; }
+    .hero-content-2 { top: calc(42% + 80px); transform: translateY(0); opacity: 0; }
+    #orbGlassOverlay {
+      position: absolute; z-index: 5; pointer-events: none;
+      mix-blend-mode: screen;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      will-change: transform, width, height;
+      opacity: 0;
+    }
+    .hero-landing-orb {
+      position: absolute; z-index: 6;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      background: none; border: none; box-shadow: none;
+      display: flex; align-items: center; justify-content: center;
+      pointer-events: none; opacity: 0;
+    }
+    .hero-landing-orb svg { width: 32px; height: 32px; color: #666; stroke-width: 2; }
+    .hero-landing-orb.clickable { pointer-events: auto; cursor: pointer; }
+    .orb-bubble {
+      position: absolute; z-index: 5; border-radius: 50%; pointer-events: none;
+      background-size: cover; background-position: center;
+      will-change: transform, opacity;
+    }
+    .hero-content-1 .section-heading {
+      margin-bottom: 36px; font-family: 'Kalice', serif;
+      font-size: 75px; line-height: 84px; letter-spacing: -0.01em;
+      color: #fff;
+      opacity: 0; animation: heroFadeIn 1.2s ease-out 0.2s forwards;
+    }
+    @keyframes heroFadeIn {
+      0% { opacity: 0; filter: blur(8px); transform: translateY(12px); }
+      100% { opacity: 1; filter: blur(0px); transform: translateY(0); }
+    }
+    .hero-content-1 .glass-btn-wrap {
+      opacity: 0; animation: heroFadeIn 1.2s ease-out 0.4s forwards;
+    }
+    #glassOrbCanvas {
+      position: absolute; top: 0; left: 0;
+      width: 100%; height: 100%;
+      opacity: 0; animation: orbFadeIn 1.4s ease-out 0.7s forwards;
+    }
+    @keyframes orbFadeIn {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+      pointer-events: none; z-index: 5;
+    }
     .meet-heading {
-      font-size: 51px; font-weight: 400; line-height: 58px;
+      font-family: 'Kalice', serif;
+      font-size: 66px; font-weight: 400; line-height: 76px;
       letter-spacing: -0.03em; margin-bottom: 20px;
     }
 
-    .plus-btn {
-      display: inline-flex; align-items: center; justify-content: center;
-      width: 56px; height: 56px; border: 1px solid #d4d4d4; border-radius: 50%;
-      margin-top: 32px; cursor: pointer; background: rgba(255,255,255,0.4);
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-    .plus-btn:hover { border-color: #999; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
-    .plus-btn svg { width: 22px; height: 22px; color: #525252; }
-
     /* ===== CREATE CARDS ===== */
     .create-cards {
-      position: relative; max-width: 700px; height: 540px;
+      position: relative; max-width: 900px; height: 700px;
       margin: 48px auto 0; cursor: grab; user-select: none;
       -webkit-user-select: none;
     }
     .create-cards:active { cursor: grabbing; }
     .create-card {
-      position: absolute; border-radius: 28px; overflow: hidden;
+      position: absolute; border-radius: 32px; overflow: hidden;
       box-shadow: 0 8px 40px rgba(0,0,0,0.12);
       left: 50%; top: 50%;
       transition: transform 0.5s cubic-bezier(0.25,1,0.5,1),
                   opacity 0.5s cubic-bezier(0.25,1,0.5,1),
                   box-shadow 0.5s cubic-bezier(0.25,1,0.5,1);
-      width: 364px; height: 494px;
+      width: 473px; height: 642px;
     }
     .create-card video {
       display: block; width: 100%; height: 100%; object-fit: cover;
@@ -305,23 +351,41 @@
     }
     .create-dot.active { background: #191919; transform: scale(1.2); }
     @media (max-width: 640px) {
-      .create-cards { height: 400px; }
-      .create-card { width: 280px; height: 380px; }
+      .create-cards { height: 520px; }
+      .create-card { width: 364px; height: 494px; }
       .create-card[data-pos="prev"] { transform: translate(calc(-50% - 35px), -50%) rotate(-5deg) scale(0.88); }
       .create-card[data-pos="next"] { transform: translate(calc(-50% + 35px), -50%) rotate(5deg) scale(0.88); }
     }
 
     /* ===== CATEGORY PILLS ===== */
-    .category-pills { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; margin-top: 32px; }
+    .category-pills { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin-top: 32px; }
     .pill {
-      display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px;
-      border-radius: 100px; font-size: 14px; font-weight: 500;
-      border: 1px solid #d4d4d4; color: #525252; background: rgba(255,255,255,0.4);
-      cursor: pointer; transition: all 0.2s;
+      display: inline-flex; align-items: center; gap: 8px; padding: 14px 28px;
+      border-radius: 999vw; font-size: 17px; font-weight: 500;
+      border: none; color: #525252; cursor: pointer; transition: all 0.3s;
+      position: relative;
+      background: linear-gradient(-75deg, rgba(255,255,255,0.05), rgba(255,255,255,0.2), rgba(255,255,255,0.05));
+      backdrop-filter: blur(2px);
+      box-shadow:
+        inset 0 1px 1px rgba(0,0,0,0.05),
+        inset 0 -1px 1px rgba(255,255,255,0.5),
+        0 2px 1px -1px rgba(0,0,0,0.12);
     }
-    .pill:hover { border-color: #aaa; background: rgba(255,255,255,0.7); }
-    .pill.active { background: #191919; color: #f0f0f0; border-color: #191919; }
-    .pill-icon { width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; }
+    .pill::after {
+      content: ''; position: absolute; inset: 0; border-radius: 999vw;
+      padding: 1px; box-sizing: border-box;
+      background: conic-gradient(from -75deg at 50% 50%, rgba(0,0,0,0.25), rgba(0,0,0,0) 5% 40%, rgba(0,0,0,0.25) 50%, rgba(0,0,0,0) 60% 95%, rgba(0,0,0,0.25)),
+        linear-gradient(180deg, rgba(255,255,255,0.5), rgba(255,255,255,0.5));
+      mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); mask-composite: exclude;
+      pointer-events: none;
+    }
+    .pill:hover { transform: scale(0.97); box-shadow: inset 0 1px 1px rgba(0,0,0,0.05), inset 0 -1px 1px rgba(255,255,255,0.5), 0 1px 1px -1px rgba(0,0,0,0.15); }
+    .pill.active { background: #191919; color: #f0f0f0; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+    .pill.active::after { display: none; }
+    .pill-icon { width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; }
+    @media (max-width: 640px) {
+      .pill { padding: 10px 20px; font-size: 14px; }
+    }
 
     /* ===== INTEGRATIONS ===== */
     .integrations-text { font-size: 35px; font-weight: 400; letter-spacing: -0.03em; line-height: 42px; }
@@ -401,6 +465,61 @@
       width: 100%;
     }
 
+    /* ===== ORB PROPERTIES PANEL ===== */
+    .orb-panel {
+      position: fixed; top: 25%; right: 24px; bottom: 25%;
+      z-index: 90; width: 300px;
+      background: rgba(255,255,255,0.92); backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 20px; padding: 24px;
+      display: flex; flex-direction: column;
+      box-shadow: 0 4px 30px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.04);
+      font-family: inherit; transition: transform 0.4s cubic-bezier(0.25,1,0.5,1), opacity 0.4s;
+    }
+    .orb-panel.collapsed { transform: translateX(calc(100% + 24px)); }
+    .orb-panel-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 20px; flex-shrink: 0;
+    }
+    .orb-panel-body {
+      overflow-y: auto; flex: 1; min-height: 0;
+    }
+    .orb-panel-title { font-size: 18px; font-weight: 500; letter-spacing: -0.02em; }
+    .orb-panel-toggle {
+      width: 36px; height: 36px; border-radius: 50%; border: 1px solid #ddd;
+      background: white; cursor: pointer; display: flex;
+      align-items: center; justify-content: center; transition: transform 0.3s;
+    }
+    .orb-panel.collapsed .orb-panel-toggle { transform: rotate(180deg); }
+    .orb-panel-toggle svg { width: 16px; height: 16px; color: #525252; }
+    .orb-prop { margin-bottom: 18px; }
+    .orb-prop-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .orb-prop-label { font-size: 14px; font-weight: 400; color: #191919; }
+    .orb-prop-value {
+      font-size: 13px; font-weight: 500; color: #525252;
+      background: #f5f5f5; border: 1px solid #e5e5e5; border-radius: 6px;
+      padding: 2px 8px; font-family: 'SF Mono', monospace; min-width: 48px; text-align: center;
+    }
+    .orb-prop input[type="range"] {
+      width: 100%; height: 4px; -webkit-appearance: none; appearance: none;
+      background: #e5e5e5; border-radius: 2px; outline: none;
+    }
+    .orb-prop input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%;
+      background: #191919; cursor: pointer; border: 2px solid white;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    }
+    .orb-panel-buttons { display: flex; gap: 8px; margin-top: 20px; }
+    .orb-panel-btn {
+      flex: 1; padding: 10px 12px; border-radius: 10px; border: 1px solid #ddd;
+      background: white; font-family: inherit; font-size: 13px; font-weight: 500;
+      cursor: pointer; transition: background 0.2s;
+    }
+    .orb-panel-btn:hover { background: #f5f5f5; }
+    @media (max-width: 768px) {
+      .orb-panel { right: 12px; width: 260px; padding: 18px; }
+    }
+
     /* ===== ORB FOOTER SECTION ===== */
     .orb-footer-section {
       position: relative; width: 100%; min-height: 100vh; overflow: hidden;
@@ -430,9 +549,10 @@
     .orb-footer-section .footer-links a:hover { color: #f0f0f0; }
     @media (max-width: 640px) {
       .section-heading { font-size: 32px; line-height: 38px; }
+      .hero-content-1 .section-heading { font-size: 42px; line-height: 50px; }
       .section-sub { font-size: 18px; line-height: 26px; }
       .cta-heading { font-size: 32px; line-height: 38px; }
-      .meet-heading { font-size: 30px; line-height: 36px; }
+      .meet-heading { font-size: 39px; line-height: 47px; }
       .integrations-text { font-size: 24px; line-height: 30px; }
       nav { padding: 16px 20px; }
       footer { flex-direction: column; gap: 16px; }
@@ -458,16 +578,292 @@
     </div>
   </nav>
 
-  <!-- Meet Wabi (Hero) -->
-  <section class="meet-wabi">
-    <h2 class="meet-heading">Meet Wabi.<br>The first personal software platform.</h2>
-    <p class="section-sub">Create, discover, and remix any mini-app in minutes</p>
-    <div class="plus-btn">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-      </svg>
+  <!-- Hero with Glass Orb Scroll Animation -->
+  <div class="hero-orb-scroll" id="heroOrbScroll">
+    <div class="hero-orb-sticky" id="heroOrbSticky">
+      <div class="hero-content-1" id="heroContent1">
+        <h1 class="section-heading">A new era of software is here.</h1>
+        <div style="display:flex;justify-content:center;margin-top:32px;">
+          <div class="glass-btn-wrap glass-btn-wrap--cta">
+            <button class="glass-btn"><span>Get started</span></button>
+            <div class="glass-btn-shadow"></div>
+          </div>
+        </div>
+      </div>
+      <div class="hero-content-2" id="heroContent2">
+        <h2 class="meet-heading"><span id="meetWabiText">Meet Wabi.</span><br><span id="meetSubHeading" style="opacity:0">The first personal software platform.</span></h2>
+        <p class="section-sub" id="meetSubText" style="opacity:0">Create, discover, and remix any mini-app in minutes</p>
+      </div>
+      <canvas id="glassOrbCanvas"></canvas>
+      <img id="orbGlassOverlay" src="/orb-glass-overlay.png" alt="" />
+      <div class="hero-landing-orb" id="heroLandingOrb">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+          <line x1="12" y1="6" x2="12" y2="18"/><line x1="6" y1="12" x2="18" y2="12"/>
+        </svg>
+      </div>
     </div>
-  </section>
+  </div>
+
+  <script src="/liquid-glass.js"></script>
+  <script>
+  (function() {
+    const scrollContainer = document.getElementById('heroOrbScroll');
+    const canvas = document.getElementById('glassOrbCanvas');
+    const content1 = document.getElementById('heroContent1');
+    const content2 = document.getElementById('heroContent2');
+    const landingOrb = document.getElementById('heroLandingOrb');
+    const orbOverlay = document.getElementById('orbGlassOverlay');
+
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = window.innerWidth * dpr;
+    canvas.height = window.innerHeight * dpr;
+
+    const glass = new LiquidGlass(canvas);
+    window._liquidGlass = glass;
+
+    // Off-screen canvas to rasterize HTML content behind the glass
+    const bgCanvas = document.createElement('canvas');
+    bgCanvas.width = canvas.width;
+    bgCanvas.height = canvas.height;
+    const bgCtx = bgCanvas.getContext('2d');
+
+    let progress = 0, targetProgress = 0;
+    // Orb load-in animation: rises 40px over ~1.2s
+    const orbLoadStart = performance.now();
+    const orbLoadDuration = 1400;
+    const orbLoadDelay = 700;
+
+    function smoothstep(edge0, edge1, x) {
+      const t = Math.max(0, Math.min(1, (x - edge0) / (edge1 - edge0)));
+      return t * t * (3 - 2 * t);
+    }
+
+    function renderBgCanvas() {
+      const w = bgCanvas.width / dpr;
+      const h = bgCanvas.height / dpr;
+      bgCtx.resetTransform();
+      bgCtx.scale(dpr, dpr);
+      // Background transitions from black to #f0f0f0 during scroll
+      const bgVal = Math.round(17 + progress * (240 - 17));
+      bgCtx.fillStyle = `rgb(${bgVal},${bgVal},${bgVal})`;
+      bgCtx.fillRect(0, 0, w, h);
+
+      // Blue line at very bottom edge — refraction pulls it into view
+      bgCtx.save();
+      bgCtx.globalAlpha = 0.01;
+      bgCtx.fillStyle = '#4488ff';
+      bgCtx.fillRect(0, h - 2, w, 2);
+      bgCtx.restore();
+
+      // "Meet Wabi." bg text: fade in + slide up from below (matches HTML content-2)
+      const meetOpacity = smoothstep(0.25, 0.5, progress);
+      const meetSlide = h * 0.8 * (1 - smoothstep(0.1, 1.0, progress));
+      if (meetOpacity > 0.01) {
+        bgCtx.save();
+        bgCtx.globalAlpha = meetOpacity;
+        bgCtx.textAlign = 'center';
+        bgCtx.fillStyle = '#191919';
+        const fontSize = w < 640 ? 39 : 66;
+        bgCtx.font = `400 ${fontSize}px Kalice, Selecta, -apple-system, sans-serif`;
+        bgCtx.fillText('Meet Wabi.', w / 2, h * 0.42 + 80 + meetSlide);
+        bgCtx.restore();
+      }
+
+      // Rest of text: only at end of scroll (0.88-1.0)
+      const restOpacity = smoothstep(0.55, 0.75, progress);
+      if (restOpacity > 0.01) {
+        const fontSize = w < 640 ? 39 : 66;
+        const baseY = h * 0.42 + 80 + meetSlide;
+        bgCtx.save();
+        bgCtx.globalAlpha = restOpacity;
+        bgCtx.textAlign = 'center';
+        bgCtx.fillStyle = '#191919';
+        bgCtx.font = `400 ${fontSize}px Kalice, Selecta, -apple-system, sans-serif`;
+        bgCtx.fillText('The first personal software platform.', w / 2, baseY + fontSize * 1.15);
+        bgCtx.fillStyle = '#525252';
+        const subSize = w < 640 ? 18 : 25;
+        bgCtx.font = `400 ${subSize}px Selecta, -apple-system, sans-serif`;
+        bgCtx.fillText('Create, discover, and remix any mini-app in minutes', w / 2, baseY + fontSize * 1.15 + subSize * 2);
+        bgCtx.restore();
+      }
+    }
+
+    function animate() {
+      const rect = scrollContainer.getBoundingClientRect();
+      const totalScroll = scrollContainer.offsetHeight - window.innerHeight;
+      targetProgress = Math.max(0, Math.min(1, -rect.top / totalScroll));
+      progress += (targetProgress - progress) * 0.08;
+
+      // Dark-to-light transition
+      const bgVal = Math.round(17 + progress * (240 - 17));
+      document.body.style.backgroundColor = `rgb(${bgVal},${bgVal},${bgVal})`;
+      // Hero text: white → dark
+      const textVal = Math.round(255 - progress * (255 - 25));
+      content1.style.color = `rgb(${textVal},${textVal},${textVal})`;
+      // Buttons and nav: white in dark mode, dark in light mode
+      const btnVal = Math.round(255 - progress * (255 - 50));
+      document.querySelectorAll('.glass-btn span').forEach(s => s.style.color = `rgb(${btnVal},${btnVal},${btnVal})`);
+      document.querySelectorAll('.nav-link').forEach(l => l.style.color = `rgb(${btnVal},${btnVal},${btnVal})`);
+      // Wabi glyph dots: white in dark, dark in light
+      document.querySelectorAll('.wabi-glyph .dot').forEach(d => d.style.background = `rgb(${btnVal},${btnVal},${btnVal})`);
+      // Button glass backgrounds: dimmer in dark mode, text stays fully bright
+      const bgO = 0.5 + 0.5 * progress; // 0.5 at start → 1 at end
+      document.querySelectorAll('.glass-btn').forEach(btn => {
+        btn.style.background = `linear-gradient(-75deg, rgba(255,255,255,${0.05*bgO}), rgba(255,255,255,${0.2*bgO}), rgba(255,255,255,${0.05*bgO}))`;
+        btn.style.boxShadow = `inset 0 0.125em 0.125em rgba(0,0,0,${0.05*bgO}), inset 0 -0.125em 0.125em rgba(255,255,255,${0.5*bgO}), 0 0.25em 0.125em -0.125em rgba(0,0,0,${0.2*bgO}), 0 0 0.1em 0.25em inset rgba(255,255,255,${0.2*bgO}), 0 0 0 0 rgba(255,255,255,1)`;
+      });
+
+      // Content-1: fade out + drift up simultaneously
+      content1.style.opacity = 1 - smoothstep(0.0, 0.5, progress);
+      const c1Drift = smoothstep(0, 0.5, progress) * 75;
+      content1.style.transform = 'translateY(calc(-50% - ' + c1Drift + 'px))';
+
+      // Content-2: starts from below viewport, same pace as content-1 but ends later
+      // Content-1 rate: 150px over 0.5 progress = 300px/unit
+      // Content-2: 500px over ~0.8 progress range ≈ same feel
+      const c2Start = window.innerHeight * 0.8;
+      const c2Slide = c2Start * (1 - smoothstep(0.1, 1.0, progress));
+      content2.style.opacity = smoothstep(0.25, 0.5, progress);
+      content2.style.transform = 'translateY(' + c2Slide + 'px)';
+      // Sub-heading and subtitle only appear at end
+      const restFade = smoothstep(0.55, 0.75, progress);
+      document.getElementById('meetSubHeading').style.opacity = restFade;
+      document.getElementById('meetSubText').style.opacity = restFade;
+
+
+      // Render background content to off-screen canvas
+      renderBgCanvas();
+      glass.setBgFromCanvas(bgCanvas);
+
+      // Smooth continuous animation — no discrete stages
+      // posY: positive = up, negative = down
+      const vh = window.innerHeight;
+
+      // Position: linear rise throughout scroll
+      const posEase = progress;
+      const startY = -vh * 0.55 - 620;
+      const endY = -vh * 0.22;
+      // Orb load-in: rises 40px from below over 1.2s
+      const loadElapsed = performance.now() - orbLoadStart - orbLoadDelay;
+      const loadProgress = Math.max(0, Math.min(1, loadElapsed / orbLoadDuration));
+      const loadEase = 1 - Math.pow(1 - loadProgress, 3);
+      const loadOffset = -40 * (1 - loadEase);
+
+      const posY = startY + (endY - startY) * posEase + 100 * Math.sin(progress * Math.PI) + loadOffset;
+
+      // Size: shrinks faster / more linear
+      const sizeEase = Math.pow(progress, 0.8);
+      const diameter = 1750 - sizeEase * 1630; // 1750 -> 120
+
+      // Always a perfect circle: equal width/height, radius=100%
+      // Dynamic thickness: scales with orb size (100% of diameter)
+      if (window._dynamicThickness !== false) {
+        glass.settings.refThickness = diameter;
+      }
+      // Blur and refraction blur: start high, reach 0 by 60% scroll
+      const blurFade = Math.max(0, 1 - progress / 0.6);
+      glass.settings.blurRadius = Math.round(5 * blurFade);
+      glass.settings.refBlur = 10 * blurFade;
+
+      glass.setShapeSize(diameter, diameter);
+      glass.setShapePosition(0, posY);
+
+      // Render the glass effect
+      glass.render();
+
+      // Position landing orb overlay (+ icon proportional to orb)
+      const landingOpacity = smoothstep(0.85, 0.95, progress);
+      landingOrb.style.opacity = landingOpacity;
+      landingOrb.style.left = '50%';
+      const orbScreenY = window.innerHeight / 2 - posY;
+      landingOrb.style.top = orbScreenY + 'px';
+      landingOrb.style.width = diameter + 'px';
+      landingOrb.style.height = diameter + 'px';
+      // Scale icon proportionally to orb (40% of diameter, min 32px)
+      const iconSize = Math.max(32, diameter * 0.4);
+      const svg = landingOrb.querySelector('svg');
+      svg.style.width = iconSize + 'px';
+      svg.style.height = iconSize + 'px';
+
+      // Position the PNG glass overlay to match the orb
+      // Opacity: 10% at start, increases to 100% by end of scroll
+      orbOverlay.style.opacity = (0.05 + 0.95 * smoothstep(0.6, 1.0, progress)) * loadEase;
+      orbOverlay.style.left = '50%';
+      orbOverlay.style.top = orbScreenY + 'px';
+      orbOverlay.style.width = diameter + 'px';
+      orbOverlay.style.height = diameter + 'px';
+
+      // Make orb clickable when near final position
+      if (progress > 0.9) {
+        landingOrb.classList.add('clickable');
+      } else {
+        landingOrb.classList.remove('clickable');
+      }
+
+      // Store current orb info for bubble spawning
+      window._orbInfo = { x: window.innerWidth / 2, y: orbScreenY, diameter: diameter };
+
+      requestAnimationFrame(animate);
+    }
+    requestAnimationFrame(animate);
+
+    // Bubble spawning on orb click
+    const BUBBLE_COLORS = [
+      '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7',
+      '#DDA0DD', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E9',
+      '#F8C471', '#82E0AA', '#F1948A', '#AED6F1', '#D7BDE2',
+    ];
+    const stickyEl = document.getElementById('heroOrbSticky');
+
+    function spawnBubbles() {
+      const info = window._orbInfo;
+      if (!info) return;
+      const count = 10 + Math.floor(Math.random() * 6);
+      for (let i = 0; i < count; i++) {
+        const bubble = document.createElement('div');
+        bubble.className = 'orb-bubble';
+        const size = 16 + Math.random() * 32;
+        const color = BUBBLE_COLORS[Math.floor(Math.random() * BUBBLE_COLORS.length)];
+        bubble.style.width = size + 'px';
+        bubble.style.height = size + 'px';
+        bubble.style.background = color;
+        // Start at orb center with random offset within orb radius
+        const angle = Math.random() * Math.PI * 2;
+        const dist = Math.random() * info.diameter * 0.3;
+        const startX = info.x + Math.cos(angle) * dist - size / 2;
+        const startY = info.y + Math.sin(angle) * dist - size / 2;
+        bubble.style.left = startX + 'px';
+        bubble.style.top = startY + 'px';
+        bubble.style.opacity = '0.9';
+        stickyEl.appendChild(bubble);
+
+        // Animate: float upward with drift
+        const driftX = (Math.random() - 0.5) * 200;
+        const riseY = -(150 + Math.random() * 250);
+        const duration = 1200 + Math.random() * 800;
+        const delay = Math.random() * 300;
+        bubble.animate([
+          { transform: 'translate(0, 0) scale(0.3)', opacity: 0 },
+          { transform: 'translate(0, 0) scale(1)', opacity: 0.9, offset: 0.15 },
+          { transform: `translate(${driftX}px, ${riseY}px) scale(0.6)`, opacity: 0 }
+        ], {
+          duration, delay, easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)', fill: 'forwards'
+        }).onfinish = () => bubble.remove();
+      }
+    }
+
+    landingOrb.addEventListener('click', spawnBubbles);
+
+    window.addEventListener('resize', () => {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = window.innerWidth * dpr;
+      canvas.height = window.innerHeight * dpr;
+      bgCanvas.width = canvas.width;
+      bgCanvas.height = canvas.height;
+      glass.resize(canvas.width, canvas.height);
+    });
+  })();
+  </script>
 
   <!-- Create -->
   <section>
@@ -565,16 +961,16 @@
     <span class="section-badge">Discover</span>
     <h2 class="section-heading">Discover and remix</h2>
     <p class="section-sub">Explore thousands of free apps made by people like you</p>
+    <div class="category-pills" id="categoryPills">
+      <span class="pill active" data-category="essentials"><span class="pill-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/></svg></span>Essentials</span>
+      <span class="pill" data-category="lifestyle"><span class="pill-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></span>Lifestyle</span>
+      <span class="pill" data-category="health"><span class="pill-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></span>Health</span>
+      <span class="pill" data-category="fitness"><span class="pill-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>Fitness</span>
+      <span class="pill" data-category="cooking"><span class="pill-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2a10 10 0 0 1 0 20 10 10 0 0 1 0-20z"/></svg></span>Cooking</span>
+      <span class="pill" data-category="tracking"><span class="pill-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span>Tracking</span>
+    </div>
     <div class="discover-gallery" id="discoverGallery">
       <div class="discover-strip" id="discoverStrip"></div>
-    </div>
-    <div class="category-pills">
-      <span class="pill active"><span class="pill-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/></svg></span>Essentials</span>
-      <span class="pill"><span class="pill-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></span>Lifestyle</span>
-      <span class="pill"><span class="pill-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></span>Health</span>
-      <span class="pill"><span class="pill-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>Fitness</span>
-      <span class="pill"><span class="pill-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2a10 10 0 0 1 0 20 10 10 0 0 1 0-20z"/></svg></span>Cooking</span>
-      <span class="pill"><span class="pill-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span>Tracking</span>
     </div>
   </section>
 
@@ -585,12 +981,15 @@
     const CARD_WIDTH = 240;
     const AUTO_SPEED = 0.3;
 
-    const APP_NAMES = [
-      'Daily Art Tutor', 'Personal Reflection', 'Bucket List', 'Daily Mindfulness',
-      'Run Club', 'Ski Trip Planner', 'Recipe Book', 'Morning Routine',
-      'Travel Journal', 'Habit Tracker', 'Movie Watchlist', 'Plant Care',
-      'Budget Planner', 'Book Club', 'Workout Log',
-    ];
+    const CATEGORY_NAMES = {
+      essentials: ['Daily Art Tutor', 'Personal Reflection', 'Bucket List', 'Daily Mindfulness', 'Run Club', 'Ski Trip Planner', 'Recipe Book', 'Morning Routine', 'Travel Journal', 'Habit Tracker', 'Movie Watchlist', 'Plant Care', 'Budget Planner', 'Book Club', 'Workout Log'],
+      lifestyle: ['Morning Pages', 'Gratitude Log', 'Capsule Wardrobe', 'Home Organizer', 'Gift Tracker', 'Mood Board', 'Vision Board', 'Dream Journal', 'Date Planner', 'Pet Care Log', 'Garden Planner', 'Minimalist Living', 'Slow Morning', 'Self Care Kit', 'Seasonal Goals'],
+      health: ['Water Tracker', 'Sleep Logger', 'Med Reminder', 'Symptom Diary', 'Mental Check-in', 'Breathing Timer', 'Posture Check', 'Eye Rest Timer', 'Allergy Log', 'Blood Pressure', 'Step Counter', 'Vitamin Tracker', 'Stretch Routine', 'Migraine Diary', 'Skin Care Log'],
+      fitness: ['Run Club', 'HIIT Timer', 'Yoga Flow', 'Gym Tracker', 'Cycling Log', 'Swimming Laps', 'Climbing Log', 'Body Weight', 'PR Tracker', 'Recovery Day', 'Mobility Flow', 'Jump Rope', 'Rowing Log', 'Trail Finder', 'Workout Split'],
+      cooking: ['Recipe Book', 'Meal Planner', 'Grocery List', 'Sourdough Timer', 'Spice Guide', 'Wine Pairing', 'Fermentation Log', 'Baking Ratios', 'Smoothie Builder', 'Pantry Tracker', 'Soup Season', 'Knife Guide', 'Pasta Shapes', 'Coffee Brewing', 'Herb Garden'],
+      tracking: ['Habit Tracker', 'Mood Logger', 'Time Blocks', 'Focus Timer', 'Reading Log', 'Savings Goal', 'Subscription Manager', 'Carbon Footprint', 'Screen Time', 'Learning Hours', 'Side Project', 'Networking Log', 'Idea Capture', 'Daily Score', 'Streak Counter'],
+    };
+    let currentCategory = 'essentials';
     const FALLBACK_COVERS = [
       'https://i.imgur.com/4Aq1p5V.png','https://i.imgur.com/qx8f4iH.png','https://i.imgur.com/AWPO3TG.png',
       'https://i.imgur.com/p9lsZOd.png','https://i.imgur.com/vwH7fhY.png','https://i.imgur.com/LMjFvVQ.png',
@@ -614,9 +1013,20 @@
       covers = FALLBACK_COVERS;
     }
 
-    async function init() {
-      await loadCovers();
-      covers.forEach((url, i) => {
+    function shuffle(arr) {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    function buildCards() {
+      strip.innerHTML = '';
+      const names = CATEGORY_NAMES[currentCategory];
+      const shuffledCovers = shuffle(covers);
+      shuffledCovers.forEach((url, i) => {
         const card = document.createElement('div');
         card.className = 'discover-card';
         card.dataset.index = i;
@@ -634,12 +1044,14 @@
 
         const name = document.createElement('span');
         name.className = 'discover-card-name';
-        name.textContent = APP_NAMES[i % APP_NAMES.length];
+        name.textContent = names[i % names.length];
         card.appendChild(name);
 
         strip.appendChild(card);
       });
+    }
 
+    function startAnimation() {
       const cards = strip.querySelectorAll('.discover-card');
       const totalSetWidth = covers.length * CARD_WIDTH;
 
@@ -668,8 +1080,16 @@
             card.style.display = 'none';
           }
         });
-        requestAnimationFrame(animate);
+        animFrame = requestAnimationFrame(animate);
       }
+      animate();
+    }
+
+    let animFrame = null;
+
+    async function init() {
+      await loadCovers();
+      buildCards();
 
       // Mouse drag
       gallery.addEventListener('mousedown', e => {
@@ -694,7 +1114,23 @@
         targetScroll -= delta * 1.5; velocity = -delta * 0.5;
       }, { passive: true });
 
-      animate();
+      startAnimation();
+
+      // Category pill click handlers
+      const pills = document.querySelectorAll('#categoryPills .pill');
+      pills.forEach(pill => {
+        pill.addEventListener('click', () => {
+          const cat = pill.dataset.category;
+          if (cat === currentCategory) return;
+          currentCategory = cat;
+          pills.forEach(p => p.classList.remove('active'));
+          pill.classList.add('active');
+          if (animFrame) cancelAnimationFrame(animFrame);
+          buildCards();
+          currentScroll = 0; targetScroll = 0; velocity = 0;
+          startAnimation();
+        });
+      });
     }
 
     const observer = new IntersectionObserver(entries => {
@@ -722,6 +1158,208 @@
   <section>
     <p class="integrations-text">20+ integrations, and hundred to come</p>
   </section>
+
+  <!-- Orb Properties Panel -->
+  <div class="orb-panel" id="orbPanel">
+    <div class="orb-panel-header">
+      <span class="orb-panel-title">Orb Properties</span>
+      <button class="orb-panel-toggle" id="orbPanelToggle">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="18 15 12 9 6 15"/></svg>
+      </button>
+    </div>
+    <div class="orb-panel-body" id="orbPanelBody">
+      <div class="orb-prop">
+        <div class="orb-prop-header"><span class="orb-prop-label">Index of Refraction</span><span class="orb-prop-value" id="valIOR">3.00</span></div>
+        <input type="range" min="1.0" max="500" step="0.01" value="3.0" data-uniform="refFactor" />
+      </div>
+      <div class="orb-prop">
+        <div class="orb-prop-header">
+          <span class="orb-prop-label">Thickness</span>
+          <span style="display:flex;align-items:center;gap:8px">
+            <label style="font-size:11px;color:#888;cursor:pointer;display:flex;align-items:center;gap:4px">
+              <input type="checkbox" id="dynamicThicknessToggle" checked style="margin:0" /> Dynamic
+            </label>
+            <span class="orb-prop-value" id="valThickness">2000</span>
+          </span>
+        </div>
+        <input type="range" min="1" max="4000" step="1" value="2000" data-uniform="refThickness" />
+      </div>
+      <div class="orb-prop">
+        <div class="orb-prop-header"><span class="orb-prop-label">Dispersion</span><span class="orb-prop-value" id="valDispersion">1.60</span></div>
+        <input type="range" min="0" max="30" step="0.1" value="1.6" data-uniform="refDispersion" />
+      </div>
+      <div class="orb-prop">
+        <div class="orb-prop-header"><span class="orb-prop-label">Refraction Blur</span><span class="orb-prop-value" id="valRefBlur">0.00</span></div>
+        <input type="range" min="0" max="20" step="0.1" value="0" data-uniform="refBlur" />
+      </div>
+      <div class="orb-prop">
+        <div class="orb-prop-header"><span class="orb-prop-label">Fresnel Range</span><span class="orb-prop-value" id="valFresnelRange">48.10</span></div>
+        <input type="range" min="1" max="100" step="0.1" value="48.1" data-uniform="refFresnelRange" />
+      </div>
+      <div class="orb-prop">
+        <div class="orb-prop-header"><span class="orb-prop-label">Fresnel Factor</span><span class="orb-prop-value" id="valFresnelFactor">38.65</span></div>
+        <input type="range" min="0" max="100" step="0.1" value="38.65" data-uniform="refFresnelFactor" />
+      </div>
+      <div class="orb-prop">
+        <div class="orb-prop-header"><span class="orb-prop-label">Fresnel Hardness</span><span class="orb-prop-value" id="valFresnelHardness">28.51</span></div>
+        <input type="range" min="0" max="100" step="0.1" value="28.51" data-uniform="refFresnelHardness" />
+      </div>
+      <div class="orb-prop">
+        <div class="orb-prop-header"><span class="orb-prop-label">Blur Radius</span><span class="orb-prop-value" id="valBlurRadius">1</span></div>
+        <input type="range" min="0" max="100" step="1" value="1" data-uniform="blurRadius" />
+      </div>
+      <div class="orb-prop">
+        <div class="orb-prop-header"><span class="orb-prop-label">Shadow Factor</span><span class="orb-prop-value" id="valShadowFactor">5.00</span></div>
+        <input type="range" min="0" max="100" step="0.1" value="5" data-uniform="shadowFactor" />
+      </div>
+      <div class="orb-prop">
+        <div class="orb-prop-header"><span class="orb-prop-label">Shadow Expand</span><span class="orb-prop-value" id="valShadowExpand">25.00</span></div>
+        <input type="range" min="0" max="100" step="0.1" value="25" data-uniform="shadowExpand" />
+      </div>
+      <div class="orb-prop">
+        <div class="orb-prop-header"><span class="orb-prop-label">Glare Factor</span><span class="orb-prop-value" id="valGlareFactor">0.00</span></div>
+        <input type="range" min="0" max="100" step="0.1" value="0" data-uniform="glareFactor" />
+      </div>
+      <div class="orb-prop">
+        <div class="orb-prop-header"><span class="orb-prop-label">Glare Range</span><span class="orb-prop-value" id="valGlareRange">54.18</span></div>
+        <input type="range" min="0" max="100" step="0.1" value="54.18" data-uniform="glareRange" />
+      </div>
+      <div class="orb-prop">
+        <div class="orb-prop-header"><span class="orb-prop-label">Glare Angle</span><span class="orb-prop-value" id="valGlareAngle">-42.09</span></div>
+        <input type="range" min="-180" max="180" step="0.1" value="-42.09" data-uniform="glareAngle" />
+      </div>
+      <div class="orb-prop">
+        <div class="orb-prop-header"><span class="orb-prop-label">Glare Hardness</span><span class="orb-prop-value" id="valGlareHardness">24.34</span></div>
+        <input type="range" min="0" max="100" step="0.1" value="24.34" data-uniform="glareHardness" />
+      </div>
+      <div class="orb-prop">
+        <div class="orb-prop-header"><span class="orb-prop-label">Glare Convergence</span><span class="orb-prop-value" id="valGlareConvergence">56.36</span></div>
+        <input type="range" min="0" max="100" step="0.1" value="56.36" data-uniform="glareConvergence" />
+      </div>
+      <div class="orb-prop">
+        <div class="orb-prop-header"><span class="orb-prop-label">Glare Opposite</span><span class="orb-prop-value" id="valGlareOppositeFactor">80.00</span></div>
+        <input type="range" min="0" max="100" step="0.1" value="80" data-uniform="glareOppositeFactor" />
+      </div>
+      <div class="orb-prop">
+        <div class="orb-prop-header"><span class="orb-prop-label">Tint R</span><span class="orb-prop-value" id="valTintR">255</span></div>
+        <input type="range" min="0" max="255" step="1" value="255" data-uniform="tintR" />
+      </div>
+      <div class="orb-prop">
+        <div class="orb-prop-header"><span class="orb-prop-label">Tint G</span><span class="orb-prop-value" id="valTintG">255</span></div>
+        <input type="range" min="0" max="255" step="1" value="255" data-uniform="tintG" />
+      </div>
+      <div class="orb-prop">
+        <div class="orb-prop-header"><span class="orb-prop-label">Tint B</span><span class="orb-prop-value" id="valTintB">255</span></div>
+        <input type="range" min="0" max="255" step="1" value="255" data-uniform="tintB" />
+      </div>
+      <div class="orb-prop">
+        <div class="orb-prop-header"><span class="orb-prop-label">Tint Opacity</span><span class="orb-prop-value" id="valTintA">0</span></div>
+        <input type="range" min="0" max="255" step="1" value="0" data-uniform="tintA" />
+      </div>
+      <div class="orb-prop">
+        <div class="orb-prop-header"><span class="orb-prop-label">Shadow Pos X</span><span class="orb-prop-value" id="valShadowPosX">0.00</span></div>
+        <input type="range" min="-50" max="50" step="0.1" value="0" data-uniform="shadowPosX" />
+      </div>
+      <div class="orb-prop">
+        <div class="orb-prop-header"><span class="orb-prop-label">Shadow Pos Y</span><span class="orb-prop-value" id="valShadowPosY">-10.00</span></div>
+        <input type="range" min="-50" max="50" step="0.1" value="-10" data-uniform="shadowPosY" />
+      </div>
+      <div class="orb-prop">
+        <div class="orb-prop-header"><span class="orb-prop-label">Merge Rate</span><span class="orb-prop-value" id="valMergeRate">0.05</span></div>
+        <input type="range" min="0" max="1" step="0.01" value="0.05" data-uniform="mergeRate" />
+      </div>
+      <div class="orb-panel-buttons">
+        <button class="orb-panel-btn" id="orbResetBtn">Reset to Default</button>
+        <button class="orb-panel-btn" id="orbExtremeBtn">Extreme Settings</button>
+      </div>
+    </div>
+  </div>
+  <script>
+  (function() {
+    const panel = document.getElementById('orbPanel');
+    const toggle = document.getElementById('orbPanelToggle');
+    const defaults = { refFactor: 3.0, refThickness: 2000, refDispersion: 1.6, refBlur: 0, refFresnelRange: 48.1, refFresnelFactor: 38.65, refFresnelHardness: 28.51, blurRadius: 1, shadowFactor: 5, shadowExpand: 25, glareFactor: 0, glareRange: 54.18, glareAngle: -42.09, glareHardness: 24.34, glareConvergence: 56.36, glareOppositeFactor: 80, tintR: 255, tintG: 255, tintB: 255, tintA: 0, shadowPosX: 0, shadowPosY: -10, mergeRate: 0.05 };
+    const extreme = { refFactor: 2.5, refThickness: 60, refDispersion: 25, refFresnelRange: 80, refFresnelFactor: 80, refFresnelHardness: 60, blurRadius: 20, shadowFactor: 50, shadowExpand: 50, glareFactor: 60, glareRange: 80, glareAngle: 0, glareHardness: 50, glareConvergence: 80, glareOppositeFactor: 100, tintR: 200, tintG: 220, tintB: 255, tintA: 40, shadowPosX: 0, shadowPosY: -20, mergeRate: 0.1 };
+
+    toggle.addEventListener('click', () => panel.classList.toggle('collapsed'));
+
+    // Show panel only when hero orb is in view
+    const heroScroll = document.getElementById('heroOrbScroll');
+    function checkVisibility() {
+      const rect = heroScroll.getBoundingClientRect();
+      const visible = rect.top < window.innerHeight && rect.bottom > 0;
+      panel.style.opacity = visible ? '1' : '0';
+      panel.style.pointerEvents = visible ? 'auto' : 'none';
+    }
+    window.addEventListener('scroll', checkVisibility, { passive: true });
+    checkVisibility();
+
+    const sliders = panel.querySelectorAll('input[type="range"]');
+    const valueDisplays = {
+      refFactor: document.getElementById('valIOR'),
+      refThickness: document.getElementById('valThickness'),
+      refDispersion: document.getElementById('valDispersion'),
+      refBlur: document.getElementById('valRefBlur'),
+      refFresnelRange: document.getElementById('valFresnelRange'),
+      refFresnelFactor: document.getElementById('valFresnelFactor'),
+      refFresnelHardness: document.getElementById('valFresnelHardness'),
+      blurRadius: document.getElementById('valBlurRadius'),
+      shadowFactor: document.getElementById('valShadowFactor'),
+      shadowExpand: document.getElementById('valShadowExpand'),
+      glareFactor: document.getElementById('valGlareFactor'),
+      glareRange: document.getElementById('valGlareRange'),
+      glareAngle: document.getElementById('valGlareAngle'),
+      glareHardness: document.getElementById('valGlareHardness'),
+      glareConvergence: document.getElementById('valGlareConvergence'),
+      glareOppositeFactor: document.getElementById('valGlareOppositeFactor'),
+      tintR: document.getElementById('valTintR'),
+      tintG: document.getElementById('valTintG'),
+      tintB: document.getElementById('valTintB'),
+      tintA: document.getElementById('valTintA'),
+      shadowPosX: document.getElementById('valShadowPosX'),
+      shadowPosY: document.getElementById('valShadowPosY'),
+      mergeRate: document.getElementById('valMergeRate'),
+    };
+
+    sliders.forEach(slider => {
+      slider.addEventListener('input', () => {
+        const key = slider.dataset.uniform;
+        const val = parseFloat(slider.value);
+        if (valueDisplays[key]) valueDisplays[key].textContent = val.toFixed(2);
+        if (window._liquidGlass) {
+          const s = window._liquidGlass.settings;
+          if (key === 'tintR') s.tint.r = val;
+          else if (key === 'tintG') s.tint.g = val;
+          else if (key === 'tintB') s.tint.b = val;
+          else if (key === 'tintA') s.tint.a = val;
+          else if (key === 'shadowPosX') s.shadowPosition.x = val;
+          else if (key === 'shadowPosY') s.shadowPosition.y = val;
+          else s[key] = val;
+        }
+      });
+    });
+
+    function setValues(vals) {
+      Object.entries(vals).forEach(([key, val]) => {
+        const slider = panel.querySelector(`input[data-uniform="${key}"]`);
+        if (slider) { slider.value = val; slider.dispatchEvent(new Event('input')); }
+      });
+    }
+
+    document.getElementById('orbResetBtn').addEventListener('click', () => setValues(defaults));
+    document.getElementById('orbExtremeBtn').addEventListener('click', () => setValues(extreme));
+
+    // Dynamic thickness toggle
+    window._dynamicThickness = true;
+    const dynToggle = document.getElementById('dynamicThicknessToggle');
+    const thicknessSlider = panel.querySelector('input[data-uniform="refThickness"]');
+    dynToggle.addEventListener('change', () => {
+      window._dynamicThickness = dynToggle.checked;
+      thicknessSlider.disabled = dynToggle.checked;
+    });
+    thicknessSlider.disabled = true;
+  })();
+  </script>
 
   <!-- Orb Footer Section (CTA + Footer with orb background) -->
   <div class="orb-footer-section" id="orbSection">
