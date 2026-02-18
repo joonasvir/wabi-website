@@ -1378,9 +1378,13 @@
             buildCards();
             currentScroll = 0; targetScroll = 0;
             velocity = -8 - Math.random() * 4; // burst of sideways motion
-            strip.style.transition = 'opacity 0.5s ease-in';
-            strip.style.opacity = '1';
+            // Apply curvature layout immediately before fading in
             startAnimation();
+            // Force one layout frame so cards are positioned before becoming visible
+            requestAnimationFrame(() => {
+              strip.style.transition = 'opacity 0.5s ease-in';
+              strip.style.opacity = '1';
+            });
             setTimeout(() => {
               strip.style.transition = '';
               strip.style.opacity = '';
