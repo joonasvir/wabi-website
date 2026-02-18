@@ -20,9 +20,46 @@
     p { font-size: 18px; line-height: 26px; color: #525252; letter-spacing: -0.03em; margin-bottom: 24px; }
     a { color: #191919; text-decoration: underline; text-underline-offset: 3px; }
     a:hover { color: #525252; }
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 32px;
+    }
+    .nav-logo { display: flex; align-items: center; text-decoration: none; }
+    .wabi-glyph { position: relative; width: 38px; height: 24px; opacity: 0.3; }
+    .wabi-glyph .dot { position: absolute; border-radius: 50%; background: #191919; width: 12px; height: 12px; }
+    .wabi-glyph .dot:nth-child(1) { top: 0; left: 1px; }
+    .wabi-glyph .dot:nth-child(2) { top: 0; left: 13px; }
+    .wabi-glyph .dot:nth-child(3) { top: 0; left: 25px; }
+    .wabi-glyph .dot:nth-child(4) { top: 12px; left: 7px; }
+    .wabi-glyph .dot:nth-child(5) { top: 12px; left: 19px; }
+    .nav-link {
+      color: #525252; text-decoration: none; font-size: 14px;
+      font-weight: 500; letter-spacing: -0.16px; transition: color 0.2s;
+    }
+    .nav-link:hover { color: #191919; }
+    @media (min-width: 768px) {
+      .wabi-glyph { width: 54px; height: 34px; }
+      .wabi-glyph .dot { width: 17px; height: 17px; }
+      .wabi-glyph .dot:nth-child(1) { top: 0; left: 1px; }
+      .wabi-glyph .dot:nth-child(2) { top: 0; left: 18px; }
+      .wabi-glyph .dot:nth-child(3) { top: 0; left: 36px; }
+      .wabi-glyph .dot:nth-child(4) { top: 15px; left: 10px; }
+      .wabi-glyph .dot:nth-child(5) { top: 15px; left: 27px; }
+      .nav-link { font-size: 16px; }
+    }
   </style>
 </head>
 <body>
+  <nav>
+    <a href="/" class="nav-logo">
+      <div class="wabi-glyph">
+        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+        <div class="dot"></div><div class="dot"></div>
+      </div>
+    </a>
+    <a href="/" class="nav-link">The product</a>
+  </nav>
   <div class="container">
     <h1>The Wabi Manifesto</h1>
     <p>The full manifesto experience is coming soon to this page. In the meantime, explore everything we're building.</p>
