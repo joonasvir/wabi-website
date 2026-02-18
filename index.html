@@ -66,6 +66,16 @@
     }
 
     .nav-right { display: flex; align-items: center; gap: 36px; }
+    nav .wabi-glyph .dot, nav .nav-link, nav .glass-btn span {
+      transition: color 0.4s ease, background 0.4s ease;
+    }
+    nav.nav-dark-bg .wabi-glyph .dot { background: #f0f0f0 !important; }
+    nav.nav-dark-bg .nav-link { color: rgba(255,255,255,0.5) !important; }
+    nav.nav-dark-bg .nav-link:hover { color: #f0f0f0 !important; }
+    nav.nav-dark-bg .glass-btn span { color: #f0f0f0 !important; }
+    nav.nav-dark-bg .glass-btn {
+      background: linear-gradient(-75deg, rgba(255,255,255,0.03), rgba(255,255,255,0.1), rgba(255,255,255,0.03)) !important;
+    }
 
     .nav-link {
       color: #525252;
@@ -296,37 +306,6 @@
     .hero-landing-orb.clickable:active {
       transform: translate(-50%, -50%) scale(1.02);
       filter: drop-shadow(0 1px 2px rgba(0,0,0,0.25));
-    }
-    .orb-input {
-      position: absolute; opacity: 0; pointer-events: none;
-      border: none; outline: none; background: transparent;
-      font-family: 'Selecta', -apple-system, BlinkMacSystemFont, sans-serif;
-      font-size: 16px; color: #191919; width: 100%; text-align: center;
-      letter-spacing: -0.02em;
-      transition: opacity 0.35s ease;
-    }
-    .orb-input::placeholder { color: #999; }
-    .hero-landing-orb.expanded {
-      width: 340px !important; height: 52px !important;
-      border-radius: 26px !important;
-      background: #fff !important;
-      border: 1.5px solid rgba(0,0,0,0.12) !important;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.1), 0 2px 8px rgba(0,0,0,0.06) !important;
-      filter: none !important;
-      transition: width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
-                  height 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
-                  border-radius 0.4s ease,
-                  background 0.3s ease,
-                  box-shadow 0.4s ease,
-                  filter 0.3s ease !important;
-      cursor: text;
-    }
-    .hero-landing-orb.expanded svg { opacity: 0; transition: opacity 0.2s ease; pointer-events: none; }
-    .hero-landing-orb.expanded .orb-input {
-      opacity: 1; pointer-events: auto;
-    }
-    @media (max-width: 640px) {
-      .hero-landing-orb.expanded { width: 280px !important; }
     }
     .orb-bubble {
       position: absolute; z-index: 5; pointer-events: none;
@@ -695,7 +674,6 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
           <line x1="12" y1="6" x2="12" y2="18"/><line x1="6" y1="12" x2="18" y2="12"/>
         </svg>
-        <input type="text" class="orb-input" id="orbInput" placeholder="What do you want to create?" />
       </div>
     </div>
   </div>
@@ -843,14 +821,14 @@
       // Position: linear rise throughout scroll
       const posEase = progress;
       const startY = -vh * 0.55 - 620;
-      const endY = -vh * 0.22 - 100;
+      const endY = -vh * 0.22 + 40;
       // Orb load-in: rises 40px from below over 1.2s
       const loadElapsed = performance.now() - orbLoadStart - orbLoadDelay;
       const loadProgress = Math.max(0, Math.min(1, loadElapsed / orbLoadDuration));
       const loadEase = 1 - Math.pow(1 - loadProgress, 3);
       const loadOffset = -40 * (1 - loadEase);
 
-      const posY = startY + (endY - startY) * posEase + 100 * Math.sin(progress * Math.PI) + loadOffset;
+      const posY = startY + (endY - startY) * posEase + 180 * Math.sin(progress * Math.PI) + loadOffset;
 
       // Size: shrinks faster / more linear
       const sizeEase = Math.pow(progress, 0.8);
@@ -878,15 +856,13 @@
       landingOrb.style.left = '50%';
       const orbScreenY = window.innerHeight / 2 - posY;
       landingOrb.style.top = orbScreenY + 'px';
-      if (!orbExpanded) {
-        landingOrb.style.width = diameter + 'px';
-        landingOrb.style.height = diameter + 'px';
-        // Scale icon proportionally to orb (40% of diameter, min 32px)
-        const iconSize = Math.max(32, diameter * 0.4);
-        const svg = landingOrb.querySelector('svg');
-        svg.style.width = iconSize + 'px';
-        svg.style.height = iconSize + 'px';
-      }
+      landingOrb.style.width = diameter + 'px';
+      landingOrb.style.height = diameter + 'px';
+      // Scale icon proportionally to orb (40% of diameter, min 32px)
+      const iconSize = Math.max(32, diameter * 0.4);
+      const svg = landingOrb.querySelector('svg');
+      svg.style.width = iconSize + 'px';
+      svg.style.height = iconSize + 'px';
 
       // Position the PNG glass overlay to match the orb
       // Opacity: 10% at start, increases to 100% by end of scroll
@@ -938,13 +914,13 @@
     }
 
     function spawnFloatingBubble(info, opts) {
-      const size = opts.size || (25 + Math.random() * 55);
+      const size = opts.size || 65;
       const el = makeBubble(info, size);
       stickyEl.appendChild(el);
       if (opts.track) landingOrbEls.push(el);
 
       const driftX = (opts.spreadX || 1) * (Math.random() - 0.5) * 250;
-      const floatY = -(info.y + 200 + Math.random() * 300); // float all the way up and off screen
+      const floatY = -(info.y + 200 + Math.random() * 300);
       const wobbleX1 = (Math.random() - 0.5) * 100;
       const wobbleX2 = (Math.random() - 0.5) * 120;
       const wobbleX3 = (Math.random() - 0.5) * 80;
@@ -954,10 +930,10 @@
 
       el.animate([
         { transform: 'translate(0, 0) scale(0)', opacity: 0 },
-        { transform: `translate(${driftX * 0.15 + wobbleX1}px, ${floatY * 0.1}px) scale(${peakScale})`, opacity: 0.85, offset: 0.1 },
-        { transform: `translate(${driftX * 0.3 + wobbleX2}px, ${floatY * 0.3}px) scale(${peakScale * 0.95})`, opacity: 0.75, offset: 0.3 },
-        { transform: `translate(${driftX * 0.55 + wobbleX3}px, ${floatY * 0.55}px) scale(${peakScale * 0.85})`, opacity: 0.6, offset: 0.55 },
-        { transform: `translate(${driftX * 0.8 + wobbleX1 * 0.5}px, ${floatY * 0.8}px) scale(${peakScale * 0.7})`, opacity: 0.35, offset: 0.8 },
+        { transform: `translate(${driftX * 0.15 + wobbleX1}px, ${floatY * 0.1}px) scale(${peakScale})`, opacity: 1, offset: 0.1 },
+        { transform: `translate(${driftX * 0.3 + wobbleX2}px, ${floatY * 0.3}px) scale(${peakScale * 0.95})`, opacity: 1, offset: 0.3 },
+        { transform: `translate(${driftX * 0.55 + wobbleX3}px, ${floatY * 0.55}px) scale(${peakScale * 0.85})`, opacity: 1, offset: 0.55 },
+        { transform: `translate(${driftX * 0.8 + wobbleX1 * 0.5}px, ${floatY * 0.8}px) scale(${peakScale * 0.7})`, opacity: 0.8, offset: 0.8 },
         { transform: `translate(${driftX}px, ${floatY}px) scale(${peakScale * 0.4})`, opacity: 0 }
       ], { duration: dur, delay, easing: 'ease-in-out', fill: 'forwards' }).onfinish = () => el.remove();
     }
@@ -967,7 +943,7 @@
       if (!info) return;
       for (let i = 0; i < 25; i++) {
         spawnFloatingBubble(info, {
-          size: 30 + Math.random() * 75,
+          size: 65,
           delay: i * 60 + Math.random() * 120,
           spreadX: 1,
           track: true
@@ -983,44 +959,21 @@
       landingOrbEls = [];
     }
 
-    const orbInput = document.getElementById('orbInput');
-    let orbExpanded = false;
-
     landingOrb.addEventListener('click', (e) => {
-      if (orbExpanded) return;
       e.stopPropagation();
       const info = window._orbInfo;
       if (!info) return;
 
-      // Spawn bubbles first
-      for (let i = 0; i < 12; i++) {
+      // Spawn bubble orbs on tap
+      for (let i = 0; i < 14; i++) {
         spawnFloatingBubble(info, {
-          size: 27 + Math.random() * 53,
+          size: 65,
           delay: Math.random() * 200,
           spreadX: 1.5,
           track: false
         });
       }
-
-      // Expand into input field
-      orbExpanded = true;
-      landingOrb.classList.add('expanded');
-      setTimeout(() => orbInput.focus(), 400);
     });
-
-    // Collapse on Escape or click outside
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && orbExpanded) collapseOrb();
-    });
-    document.addEventListener('click', (e) => {
-      if (orbExpanded && !landingOrb.contains(e.target)) collapseOrb();
-    });
-    function collapseOrb() {
-      orbExpanded = false;
-      orbInput.blur();
-      orbInput.value = '';
-      landingOrb.classList.remove('expanded');
-    }
 
     window.addEventListener('resize', () => {
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -1878,7 +1831,7 @@
             const dy = target.y - body.position.y;
             const dist = Math.sqrt(dx * dx + dy * dy);
             // Blend current velocity toward target; stronger when further away
-            const strength = Math.min(dist * 0.08, 8);
+            const strength = Math.min(dist * 0.12, 14);
             if (dist > 0.5) {
               Matter.Body.setVelocity(body, {
                 x: body.velocity.x * 0.8 + (dx / dist) * strength,
@@ -1953,8 +1906,7 @@
           const ty = cy + Math.sin(angle) * radius;
           circleTargets.set(body.id, { x: tx, y: ty });
           body.collisionFilter.group = -1; // disable orb-orb collisions
-          Matter.Body.setVelocity(body, { x: 0, y: 0 });
-          Matter.Body.setPosition(body, { x: tx, y: ty });
+          // Don't teleport — let the render loop's velocity steering animate them smoothly
         });
       });
 
@@ -2005,6 +1957,23 @@
       if (entries[0].isIntersecting) { observer.disconnect(); init(); }
     }, { threshold: 0.1 });
     observer.observe(container);
+  })();
+  </script>
+
+  <script>
+  // Toggle nav to light colors when footer section is in view
+  (() => {
+    const nav = document.querySelector('nav');
+    const footer = document.getElementById('orbSection');
+    if (!nav || !footer) return;
+    const obs = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        nav.classList.add('nav-dark-bg');
+      } else {
+        nav.classList.remove('nav-dark-bg');
+      }
+    }, { threshold: 0.15 });
+    obs.observe(footer);
   })();
   </script>
 </body>
