@@ -460,7 +460,12 @@
     /* ===== DISCOVER GALLERY ===== */
     .discover-gallery {
       position: relative; width: 100vw; height: 55vh; min-height: 420px;
-      margin: 20px calc(-50vw + 50%) 0;
+      margin: -10px calc(-50vw + 50%) 0;
+      opacity: 0; transform: translateY(40px);
+      transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+    .discover-gallery.visible {
+      opacity: 1; transform: translateY(0);
       perspective: 1200px; overflow: visible;
       cursor: grab; display: flex; align-items: center; justify-content: center;
     }
@@ -480,7 +485,7 @@
         inset 0 1px 0 rgba(255,255,255,0.9),
         inset 0 -1px 2px rgba(0,0,0,0.04);
       display: flex; flex-direction: column; align-items: center;
-      justify-content: center; gap: 20px; padding: 20px 20px 18px;
+      justify-content: center; gap: 20px; padding: 24px 20px 24px;
     }
     .discover-card:hover {
       box-shadow: 0 8px 32px rgba(0,0,0,0.1),
@@ -1158,6 +1163,12 @@
     const gallery = document.getElementById('discoverGallery');
     const strip = document.getElementById('discoverStrip');
     const CARD_WIDTH = 312;
+
+    // Smooth appear on scroll
+    const galleryObserver = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) { gallery.classList.add('visible'); galleryObserver.disconnect(); }
+    }, { threshold: 0.15 });
+    galleryObserver.observe(gallery);
     const AUTO_SPEED = 0.3;
 
     const CATEGORY_NAMES = {
