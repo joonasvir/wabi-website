@@ -620,7 +620,7 @@ class LiquidGlass {
     // Default settings from user's JSON
     this.settings = {
       refThickness: 2000,
-      refFactor: 3.0,
+      refFactor: 30,
       refDispersion: 1.6,
       refFresnelRange: 48.1,
       refFresnelHardness: 28.51,
