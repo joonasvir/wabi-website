@@ -593,6 +593,19 @@
     .orb-footer-section .footer-links a { color: rgba(255,255,255,0.4); }
     .orb-footer-section .footer-links a:hover { color: #f0f0f0; }
     .orb-footer-section .glass-btn span { color: #f0f0f0 !important; }
+    .orb-controls {
+      position: absolute; bottom: 80px; right: 24px; z-index: 10;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .orb-control-btn {
+      width: 40px; height: 40px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.15);
+      background: rgba(255,255,255,0.08); backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      color: rgba(255,255,255,0.5); cursor: pointer; display: flex;
+      align-items: center; justify-content: center; transition: all 0.25s;
+      font-size: 16px;
+    }
+    .orb-control-btn:hover { background: rgba(255,255,255,0.15); color: #f0f0f0; }
     @media (max-width: 640px) {
       .section-heading { font-size: 32px; line-height: 38px; }
       .hero-content-1 .section-heading { font-size: 42px; line-height: 50px; }
@@ -1553,6 +1566,18 @@
       </form>
     </section>
 
+    <div class="orb-controls" id="orbControls">
+      <button class="orb-control-btn" id="orbCircleBtn" title="Arrange in circle">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>
+      </button>
+      <button class="orb-control-btn" id="orbShakeBtn" title="Shake">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 12h4l3-9 4 18 3-9h6"/></svg>
+      </button>
+      <button class="orb-control-btn" id="orbDropBtn" title="Drop more">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
+      </button>
+    </div>
+
     <footer>
       <a href="/" class="footer-logo">
         <div class="footer-glyph">
@@ -1795,6 +1820,41 @@
         Matter.Body.setPosition(walls[2], { x: rect.width + wallT / 2, y: rect.height / 2 });
       }
       window.addEventListener('resize', handleResize);
+
+      // Control buttons
+      document.getElementById('orbCircleBtn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        const rect = getRect();
+        const cx = rect.width / 2;
+        const cy = rect.height * 0.4;
+        const orbs = Matter.Composite.allBodies(engine.world).filter(b => b.label === 'orb');
+        const radius = Math.min(rect.width, rect.height) * 0.32;
+        orbs.forEach((body, i) => {
+          const angle = (i / orbs.length) * Math.PI * 2 - Math.PI / 2;
+          const tx = cx + Math.cos(angle) * radius;
+          const ty = cy + Math.sin(angle) * radius;
+          Matter.Body.setVelocity(body, { x: 0, y: 0 });
+          Matter.Body.setPosition(body, { x: tx, y: ty });
+        });
+      });
+
+      document.getElementById('orbShakeBtn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        const orbs = Matter.Composite.allBodies(engine.world).filter(b => b.label === 'orb');
+        orbs.forEach(body => {
+          Matter.Body.setVelocity(body, {
+            x: (Math.random() - 0.5) * 20,
+            y: -(5 + Math.random() * 15)
+          });
+        });
+      });
+
+      document.getElementById('orbDropBtn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        for (let i = 0; i < 8; i++) {
+          setTimeout(() => addOrb(), i * 50);
+        }
+      });
     }
 
     const observer = new IntersectionObserver((entries) => {
