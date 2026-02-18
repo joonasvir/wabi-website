@@ -654,13 +654,19 @@
       bgCtx.fillStyle = `rgb(${bgVal},${bgVal},${bgVal})`;
       bgCtx.fillRect(0, 0, w, h);
 
-      // Blue line at very bottom edge — refraction pulls it into view, fades out by 50%
-      const blueLineAlpha = Math.max(0, 1 - progress / 0.5);
+      // Blue gradient just below visible screen — refraction pulls it into view, fades out by 50%
+      const blueLineAlpha = Math.max(0, 0.5 * (1 - progress / 0.5));
       if (blueLineAlpha > 0.001) {
         bgCtx.save();
         bgCtx.globalAlpha = blueLineAlpha;
-        bgCtx.fillStyle = '#4488ff';
-        bgCtx.fillRect(0, h - 2, w, 2);
+        const grad = bgCtx.createLinearGradient(0, h, w, h);
+        grad.addColorStop(0, 'rgba(30, 100, 255, 0)');
+        grad.addColorStop(0.3, 'rgba(50, 120, 255, 1)');
+        grad.addColorStop(0.5, 'rgba(80, 160, 255, 1)');
+        grad.addColorStop(0.7, 'rgba(50, 120, 255, 1)');
+        grad.addColorStop(1, 'rgba(30, 100, 255, 0)');
+        bgCtx.fillStyle = grad;
+        bgCtx.fillRect(0, h, w, 6);
         bgCtx.restore();
       }
 
