@@ -630,18 +630,19 @@
     .orb-footer-section .footer-links a:hover { color: #f0f0f0; }
     .orb-footer-section .glass-btn span { color: #f0f0f0 !important; }
     .orb-controls {
-      position: absolute; bottom: 80px; right: 24px; z-index: 10;
+      position: absolute; top: 50%; right: 24px; z-index: 10;
+      transform: translateY(-50%);
       display: flex; flex-direction: column; gap: 8px;
     }
     .orb-control-btn {
-      width: 40px; height: 40px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.15);
-      background: rgba(255,255,255,0.08); backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      color: rgba(255,255,255,0.5); cursor: pointer; display: flex;
+      width: 40px; height: 40px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.18); backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      color: rgba(255,255,255,0.7); cursor: pointer; display: flex;
       align-items: center; justify-content: center; transition: all 0.25s;
       font-size: 16px;
     }
-    .orb-control-btn:hover { background: rgba(255,255,255,0.15); color: #f0f0f0; }
+    .orb-control-btn:hover { background: rgba(255,255,255,0.28); color: #f0f0f0; }
     @media (max-width: 640px) {
       .section-heading { font-size: 32px; line-height: 38px; }
       .hero-content-1 .section-heading { font-size: 42px; line-height: 50px; }
