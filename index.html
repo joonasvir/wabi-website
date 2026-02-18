@@ -431,7 +431,7 @@
     }
 
     /* ===== CATEGORY PILLS ===== */
-    .category-pills { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin-top: 32px; }
+    .category-pills { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin-top: 32px; position: relative; z-index: 2; }
     .pill {
       display: inline-flex; align-items: center; gap: 8px; padding: 14px 28px;
       border-radius: 999vw; font-size: 17px; font-weight: 500;
@@ -1398,9 +1398,29 @@
           pills.forEach(p => p.classList.remove('active'));
           pill.classList.add('active');
           if (animFrame) cancelAnimationFrame(animFrame);
-          buildCards();
-          currentScroll = 0; targetScroll = 0; velocity = 0;
-          startAnimation();
+
+          // Slide out to the left, then rebuild and slide in from the right
+          strip.style.transition = 'transform 0.35s ease-in, opacity 0.35s ease-in';
+          strip.style.transform = 'translateX(-120px)';
+          strip.style.opacity = '0';
+          setTimeout(() => {
+            buildCards();
+            currentScroll = 0; targetScroll = 0; velocity = 0;
+            strip.style.transition = 'none';
+            strip.style.transform = 'translateX(120px)';
+            strip.style.opacity = '0';
+            requestAnimationFrame(() => {
+              strip.style.transition = 'transform 0.45s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.45s ease-out';
+              strip.style.transform = 'translateX(0)';
+              strip.style.opacity = '1';
+              setTimeout(() => {
+                strip.style.transition = '';
+                strip.style.transform = '';
+                strip.style.opacity = '';
+                startAnimation();
+              }, 460);
+            });
+          }, 360);
         });
       });
     }
