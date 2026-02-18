@@ -1683,6 +1683,9 @@
       <button class="orb-control-btn" id="orbDropBtn" title="Drop more">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
       </button>
+      <button class="orb-control-btn" id="orbClearBtn" title="Clear">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
     </div>
 
     <footer>
@@ -1991,6 +1994,28 @@
         for (let i = 0; i < 8; i++) {
           setTimeout(() => addOrb(), i * 50);
         }
+      });
+
+      document.getElementById('orbClearBtn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        restoreGravity();
+        // Temporarily remove floor so orbs fall through
+        Matter.Composite.remove(engine.world, walls[0]);
+        const orbs = Matter.Composite.allBodies(engine.world).filter(b => b.label === 'orb');
+        orbs.forEach(body => {
+          Matter.Body.setVelocity(body, { x: (Math.random() - 0.5) * 3, y: 2 + Math.random() * 4 });
+        });
+        // After orbs fall off, remove them, restore floor, drop fresh ones
+        setTimeout(() => {
+          orbs.forEach(body => {
+            orbDataMap.delete(body.id);
+            Matter.Composite.remove(engine.world, body);
+          });
+          Matter.Composite.add(engine.world, walls[0]);
+          for (let i = 0; i < DROP_COUNT; i++) {
+            setTimeout(() => addOrb(), i * 60);
+          }
+        }, 800);
       });
     }
 
