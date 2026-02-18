@@ -592,6 +592,7 @@
       </div>
       <div class="hero-content-2" id="heroContent2">
         <h2 class="meet-heading"><span id="meetWabiText">Meet Wabi.</span><br><span id="meetSubHeading" style="opacity:0">The first personal software platform.</span></h2>
+        <p class="section-sub" id="meetSubText" style="opacity:0">Create, discover, and remix any mini-app in minutes</p>
       </div>
       <canvas id="glassOrbCanvas"></canvas>
       <img id="orbGlassOverlay" src="/orb-glass-overlay.png" alt="" />
@@ -679,6 +680,10 @@
         bgCtx.fillStyle = '#191919';
         bgCtx.font = `400 ${fontSize}px Kalice, Selecta, -apple-system, sans-serif`;
         bgCtx.fillText('The first personal software platform.', w / 2, baseY + fontSize * 1.15);
+        bgCtx.fillStyle = '#525252';
+        const subSize = w < 640 ? 18 : 25;
+        bgCtx.font = `400 ${subSize}px Selecta, -apple-system, sans-serif`;
+        bgCtx.fillText('Create, discover, and remix any mini-app in minutes', w / 2, baseY + fontSize * 1.15 + subSize * 2);
         bgCtx.restore();
       }
     }
@@ -723,6 +728,7 @@
       // Sub-heading and subtitle only appear at end
       const restFade = smoothstep(0.55, 0.75, progress);
       document.getElementById('meetSubHeading').style.opacity = restFade;
+      document.getElementById('meetSubText').style.opacity = restFade;
 
 
       // Render background content to off-screen canvas
