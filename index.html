@@ -338,7 +338,7 @@
       position: relative; max-width: 900px; height: 860px;
       margin: 48px auto 0; cursor: grab; user-select: none;
       -webkit-user-select: none; perspective: 1200px;
-      transform: translateY(-200px);
+      transform: translateY(-350px);
     }
     .create-cards:active { cursor: grabbing; }
     .create-card {
@@ -1077,7 +1077,7 @@
         const rawT = 1 - (rect.top - vh * 0.3) / (vh * 0.7);
         const t = Math.max(0, Math.min(1, rawT));
         const ease = t * t * (3 - 2 * t);
-        container.style.transform = `translateY(${-200 + 200 * ease}px)`;
+        container.style.transform = `translateY(${-350 + 350 * ease}px)`;
 
         // Trigger spring fan-out once when section is ~40% in view
         if (!hasFanned && t > 0.35) {
