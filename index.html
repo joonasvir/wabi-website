@@ -1725,8 +1725,8 @@
     const MAX_SCALE = 1.1;
     const DAMPING = 0.005;
     const DROP_COUNT = 30;
-    const MOUSE_FORCE = 0.008;
-    const MOUSE_RADIUS = 150;
+    const MOUSE_FORCE = 0.025;
+    const MOUSE_RADIUS = 180;
 
     const container = document.getElementById('orbSection');
     const canvas = document.getElementById('orbCanvas');
@@ -1902,6 +1902,22 @@
           });
         }
 
+        // Circle mode: spring force back to target positions
+        if (circleMode) {
+          orbs.forEach(body => {
+            const target = circleTargets.get(body.id);
+            if (!target) return;
+            const dx = target.x - body.position.x;
+            const dy = target.y - body.position.y;
+            const springK = 0.0004;
+            const dampK = 0.04;
+            Matter.Body.applyForce(body, body.position, {
+              x: dx * springK - body.velocity.x * dampK * body.mass,
+              y: dy * springK - body.velocity.y * dampK * body.mass,
+            });
+          });
+        }
+
         orbs.forEach(body => {
           const data = orbDataMap.get(body.id);
           const radius = body.circleRadius || BASE_RADIUS;
@@ -1940,12 +1956,12 @@
 
       // Control buttons
       let circleMode = false;
+      let circleTargets = new Map(); // bodyId -> { x, y }
       function restoreGravity() {
         if (circleMode) {
           circleMode = false;
+          circleTargets.clear();
           engine.gravity.y = 0.8;
-          const orbs = Matter.Composite.allBodies(engine.world).filter(b => b.label === 'orb');
-          orbs.forEach(body => { Matter.Body.setStatic(body, false); });
         }
       }
 
@@ -1957,14 +1973,15 @@
         const orbs = Matter.Composite.allBodies(engine.world).filter(b => b.label === 'orb');
         const radius = Math.min(rect.width, rect.height) * 0.32;
         circleMode = true;
+        circleTargets.clear();
         engine.gravity.y = 0;
         orbs.forEach((body, i) => {
           const angle = (i / orbs.length) * Math.PI * 2 - Math.PI / 2;
           const tx = cx + Math.cos(angle) * radius;
           const ty = cy + Math.sin(angle) * radius;
+          circleTargets.set(body.id, { x: tx, y: ty });
           Matter.Body.setVelocity(body, { x: 0, y: 0 });
           Matter.Body.setPosition(body, { x: tx, y: ty });
-          Matter.Body.setStatic(body, true);
         });
       });
 
