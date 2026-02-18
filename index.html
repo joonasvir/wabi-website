@@ -365,18 +365,34 @@
     }
     .discover-card {
       position: absolute; top: 50%; left: 50%;
-      width: 220px; height: 300px;
-      margin-left: -110px; margin-top: -150px;
+      width: 220px; height: 260px;
+      margin-left: -110px; margin-top: -130px;
       border-radius: 24px; overflow: hidden;
       transform-style: preserve-3d; will-change: transform, opacity;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.08);
-      transition: box-shadow 0.4s ease;
-    }
-    .discover-card img {
-      width: 100%; height: 100%; object-fit: cover; display: block;
+      background: rgba(255,255,255,0.6);
+      box-shadow: 0 4px 24px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.8);
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; gap: 16px; padding: 24px;
     }
     .discover-card:hover {
-      box-shadow: 0 20px 60px rgba(0,0,0,0.12);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.8);
+    }
+    .discover-orb {
+      width: 140px; height: 140px; border-radius: 50%;
+      position: relative; overflow: hidden; flex-shrink: 0;
+    }
+    .discover-orb img {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+    }
+    .discover-orb .orb-glass {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none;
+    }
+    .discover-card-name {
+      font-size: 16px; font-weight: 500; color: #525252;
+      letter-spacing: -0.02em; text-align: center;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      max-width: 100%;
     }
 
     /* ===== ORB FOOTER SECTION ===== */
@@ -550,7 +566,12 @@
     const CARD_WIDTH = 240;
     const AUTO_SPEED = 0.3;
 
-    // Use Wabi API covers for the gallery cards
+    const APP_NAMES = [
+      'Daily Art Tutor', 'Personal Reflection', 'Bucket List', 'Daily Mindfulness',
+      'Run Club', 'Ski Trip Planner', 'Recipe Book', 'Morning Routine',
+      'Travel Journal', 'Habit Tracker', 'Movie Watchlist', 'Plant Care',
+      'Budget Planner', 'Book Club', 'Workout Log',
+    ];
     const FALLBACK_COVERS = [
       'https://i.imgur.com/4Aq1p5V.png','https://i.imgur.com/qx8f4iH.png','https://i.imgur.com/AWPO3TG.png',
       'https://i.imgur.com/p9lsZOd.png','https://i.imgur.com/vwH7fhY.png','https://i.imgur.com/LMjFvVQ.png',
@@ -580,9 +601,23 @@
         const card = document.createElement('div');
         card.className = 'discover-card';
         card.dataset.index = i;
+
+        const orb = document.createElement('div');
+        orb.className = 'discover-orb';
         const img = document.createElement('img');
         img.src = url; img.loading = 'lazy'; img.draggable = false;
-        card.appendChild(img);
+        orb.appendChild(img);
+        const glass = document.createElement('img');
+        glass.className = 'orb-glass';
+        glass.src = '/orb-overlay.png'; glass.draggable = false;
+        orb.appendChild(glass);
+        card.appendChild(orb);
+
+        const name = document.createElement('span');
+        name.className = 'discover-card-name';
+        name.textContent = APP_NAMES[i % APP_NAMES.length];
+        card.appendChild(name);
+
         strip.appendChild(card);
       });
 
