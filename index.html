@@ -1802,6 +1802,9 @@
       const ctx = canvas.getContext('2d');
       ctx.scale(dpr, dpr);
 
+      let circleMode = false;
+      let circleTargets = new Map();
+
       engine = Matter.Engine.create({ gravity: { x: 0, y: 0.8 }, enableSleeping: false });
       engine.positionIterations = 6;
       engine.velocityIterations = 4;
@@ -1941,8 +1944,6 @@
       window.addEventListener('resize', handleResize);
 
       // Control buttons
-      let circleMode = false;
-      let circleTargets = new Map(); // bodyId -> { x, y }
       function restoreGravity() {
         if (circleMode) {
           circleMode = false;
