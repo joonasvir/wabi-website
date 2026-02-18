@@ -804,7 +804,7 @@
       // Position: linear rise throughout scroll
       const posEase = progress;
       const startY = -vh * 0.55 - 620;
-      const endY = -vh * 0.22;
+      const endY = -vh * 0.22 - 20;
       // Orb load-in: rises 40px from below over 1.2s
       const loadElapsed = performance.now() - orbLoadStart - orbLoadDelay;
       const loadProgress = Math.max(0, Math.min(1, loadElapsed / orbLoadDuration));
