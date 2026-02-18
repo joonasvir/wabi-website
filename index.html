@@ -776,7 +776,7 @@
       glass.render();
 
       // Position landing orb overlay (+ icon proportional to orb)
-      const landingOpacity = smoothstep(0.85, 0.95, progress);
+      const landingOpacity = smoothstep(0.7, 0.85, progress);
       landingOrb.style.opacity = landingOpacity;
       landingOrb.style.left = '50%';
       const orbScreenY = window.innerHeight / 2 - posY;
@@ -798,7 +798,7 @@
       orbOverlay.style.height = diameter + 'px';
 
       // Make orb clickable when near final position
-      if (progress > 0.9) {
+      if (progress > 0.7) {
         landingOrb.classList.add('clickable');
       } else {
         landingOrb.classList.remove('clickable');
