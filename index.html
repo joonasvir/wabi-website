@@ -369,7 +369,7 @@
       position: relative; max-width: 900px; height: 690px;
       margin: 48px auto 0; cursor: grab; user-select: none;
       -webkit-user-select: none; perspective: 1200px;
-      transform: translateY(-350px);
+      transform: translateY(0);
     }
     .create-cards:active { cursor: grabbing; }
     .create-card {
@@ -1168,35 +1168,8 @@
       window.addEventListener('mousemove', e => moveDrag(e.clientX));
       window.addEventListener('mouseup', endDrag);
 
-      // Scroll: slide container down from -200px to 0
-      // Fan-out: triggered once with spring bounce when section enters view
-      let hasFanned = false;
-      function updateCardScroll() {
-        const rect = container.getBoundingClientRect();
-        const vh = window.innerHeight;
-        // Slide progress: container moves from -200px to 0
-        const rawT = 1 - (rect.top - vh * 0.3) / (vh * 0.7);
-        const t = Math.max(0, Math.min(1, rawT));
-        const ease = t * t * (3 - 2 * t);
-        container.style.transform = `translateY(${-350 + 350 * ease}px)`;
-
-        // Trigger spring fan-out once when section is ~40% in view
-        if (!hasFanned && t > 0.35) {
-          hasFanned = true;
-          container.classList.add('fanning');
-          container.classList.add('fanned');
-          // Remove fanning class after spring animation completes so normal transitions resume
-          setTimeout(() => container.classList.remove('fanning'), 1100);
-        }
-        // Reset if scrolled back up
-        if (hasFanned && t < 0.1) {
-          hasFanned = false;
-          container.classList.remove('fanned');
-          container.classList.remove('fanning');
-        }
-      }
-      window.addEventListener('scroll', updateCardScroll, { passive: true });
-      updateCardScroll();
+      // Start fanned out immediately
+      container.classList.add('fanned');
     })();
     </script>
   </section>
