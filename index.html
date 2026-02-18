@@ -17,6 +17,8 @@
       font-family: 'Selecta', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
       color: #191919;
       background: #111;
+      overflow-x: hidden;
+      overflow-x: clip;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
     }
@@ -33,43 +35,46 @@
     }
     @media (min-width: 768px) { nav { padding: 32px 32px; } }
 
-    .nav-logo { display: flex; align-items: center; text-decoration: none; }
+    .nav-logo {
+      display: flex; align-items: center; text-decoration: none;
+      overflow: hidden; width: 38px;
+      transition: width 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+    .nav-logo:hover { width: 130px; }
 
-    /* Wabi glyph: 5 circles in quincunx */
-    .wabi-glyph { position: relative; width: 38px; height: 24px; opacity: 0.3; transition: opacity 0.3s ease; }
-    .wabi-glyph .dot { position: absolute; border-radius: 50%; background: #191919; width: 12px; height: 12px; }
-    .wabi-glyph .dot:nth-child(1) { top: 0; left: 1px; }
-    .wabi-glyph .dot:nth-child(2) { top: 0; left: 13px; }
-    .wabi-glyph .dot:nth-child(3) { top: 0; left: 25px; }
-    .wabi-glyph .dot:nth-child(4) { top: 12px; left: 7px; }
-    .wabi-glyph .dot:nth-child(5) { top: 12px; left: 19px; }
-    .wabi-glyph .dot { transition: opacity 0.3s ease; }
-    .nav-logo:hover .wabi-glyph { opacity: 0.6; }
-    .nav-logo:hover .dot { animation: dotShimmer 1.2s ease-in-out infinite; }
-    .nav-logo:hover .dot:nth-child(1) { animation-delay: 0s; }
-    .nav-logo:hover .dot:nth-child(2) { animation-delay: 0.12s; }
-    .nav-logo:hover .dot:nth-child(3) { animation-delay: 0.24s; }
-    .nav-logo:hover .dot:nth-child(4) { animation-delay: 0.36s; }
-    .nav-logo:hover .dot:nth-child(5) { animation-delay: 0.48s; }
+    /* Wabi SVG logo */
+    .wabi-logo { height: 30px; width: 130px; flex-shrink: 0; display: block; }
+    .wabi-logo .logo-dot {
+      fill: #191919; opacity: 0.3;
+      transition: fill 0.4s ease, opacity 0.3s ease;
+    }
+    .wabi-logo .logo-text {
+      fill: #191919; opacity: 0;
+      transition: fill 0.4s ease, opacity 0.4s ease;
+    }
+    .nav-logo:hover .logo-dot { animation: dotShimmer 1.2s ease-in-out infinite; }
+    .nav-logo:hover .logo-dot:nth-child(1) { animation-delay: 0s; }
+    .nav-logo:hover .logo-dot:nth-child(2) { animation-delay: 0.12s; }
+    .nav-logo:hover .logo-dot:nth-child(3) { animation-delay: 0.24s; }
+    .nav-logo:hover .logo-dot:nth-child(4) { animation-delay: 0.36s; }
+    .nav-logo:hover .logo-dot:nth-child(5) { animation-delay: 0.48s; }
+    .nav-logo:hover .logo-text { opacity: 0.3; }
     @keyframes dotShimmer {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.3; }
+      0%, 100% { opacity: 0.6; }
+      50% { opacity: 0.18; }
     }
     @media (min-width: 768px) {
-      .wabi-glyph { width: 54px; height: 34px; }
-      .wabi-glyph .dot { width: 17px; height: 17px; }
-      .wabi-glyph .dot:nth-child(1) { top: 0; left: 1px; }
-      .wabi-glyph .dot:nth-child(2) { top: 0; left: 18px; }
-      .wabi-glyph .dot:nth-child(3) { top: 0; left: 36px; }
-      .wabi-glyph .dot:nth-child(4) { top: 15px; left: 10px; }
-      .wabi-glyph .dot:nth-child(5) { top: 15px; left: 27px; }
+      .nav-logo { width: 54px; }
+      .nav-logo:hover { width: 186px; }
+      .wabi-logo { height: 43px; width: 186px; }
     }
 
     .nav-right { display: flex; align-items: center; gap: 36px; }
-    nav .wabi-glyph .dot, nav .nav-link, nav .glass-btn span {
-      transition: color 0.4s ease, background 0.4s ease;
+    nav .logo-dot, nav .logo-text, nav .nav-link, nav .glass-btn span {
+      transition: color 0.4s ease, fill 0.4s ease;
     }
-    nav.nav-dark-bg .wabi-glyph .dot { background: #f0f0f0 !important; }
+    nav.nav-dark-bg .logo-dot { fill: #f0f0f0 !important; }
+    nav.nav-dark-bg .logo-text { fill: #f0f0f0 !important; }
     nav.nav-dark-bg .nav-link { color: rgba(255,255,255,0.5) !important; }
     nav.nav-dark-bg .nav-link:hover { color: #f0f0f0 !important; }
     nav.nav-dark-bg .glass-btn span { color: #f0f0f0 !important; }
@@ -267,7 +272,7 @@
     /* ===== HERO ORB SCROLL ===== */
     .hero-orb-scroll { position: relative; height: 250vh; }
     .hero-orb-sticky {
-      position: sticky; top: 0; height: 100vh;
+      position: sticky; top: 0; height: 100vh; height: 100dvh;
       display: flex; align-items: center; justify-content: center;
       overflow: hidden;
     }
@@ -630,7 +635,12 @@
       .meet-heading { font-size: 39px; line-height: 47px; }
       .integrations-text { font-size: 24px; line-height: 30px; }
       nav { padding: 16px 20px; }
+      .nav-right { gap: 16px; }
       footer { flex-direction: column; gap: 16px; }
+      .footer-links { flex-wrap: wrap; justify-content: center; }
+    }
+    @media (max-width: 480px) {
+      .nav-link { display: none; }
     }
   </style>
 </head>
@@ -639,10 +649,14 @@
   <!-- Nav -->
   <nav>
     <a href="/" class="nav-logo">
-      <div class="wabi-glyph">
-        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
-        <div class="dot"></div><div class="dot"></div>
-      </div>
+      <svg class="wabi-logo" viewBox="0 0 260 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path class="logo-dot" d="M23.8482 27.6251C23.8482 21.0748 18.5103 15.7658 11.9241 15.7658C5.33794 15.7658 0 21.0748 0 27.6251C0 34.1755 5.33794 39.4845 11.9241 39.4845C18.5103 39.4845 23.8482 34.1755 23.8482 27.6251Z"/>
+        <path class="logo-dot" d="M47.6539 27.6506C47.6539 21.1002 42.3159 15.7913 35.7298 15.7913C29.1436 15.7913 23.8057 21.1002 23.8057 27.6506C23.8057 34.201 29.1436 39.5099 35.7298 39.5099C42.3159 39.5099 47.6539 34.201 47.6539 27.6506Z"/>
+        <path class="logo-dot" d="M71.4849 27.6251C71.4849 21.0748 66.147 15.7658 59.5608 15.7658C52.9747 15.7658 47.6367 21.0748 47.6367 27.6251C47.6367 34.1755 52.9747 39.4845 59.5608 39.4845C66.147 39.4845 71.4849 34.1755 71.4849 27.6251Z"/>
+        <path class="logo-dot" d="M59.5567 48.1406C59.5567 41.5903 54.2188 36.2813 47.6326 36.2813C41.0464 36.2813 35.7085 41.5903 35.7085 48.1406C35.7085 54.691 41.0464 60 47.6326 60C54.2188 60 59.5567 54.691 59.5567 48.1406Z"/>
+        <path class="logo-dot" d="M35.751 48.1026C35.751 41.5522 30.4131 36.2432 23.8269 36.2432C17.2408 36.2432 11.9028 41.5522 11.9028 48.1026C11.9028 54.6529 17.2408 59.9619 23.8269 59.9619C30.4131 59.9619 35.751 54.6529 35.751 48.1026Z"/>
+        <path class="logo-text" d="M117.088 59H107.013L94 17.0223H104.494L112.47 47.2463L120.866 17.0223H130.94L139.756 47.2463L147.731 17.0223H157.806L144.793 59H134.718L125.903 28.7761L117.088 59ZM173.496 59.8396C165.1 59.8396 158.384 54.8022 158.384 47.2463C158.384 39.6903 163.841 35.8283 171.817 34.653L180.212 33.3936C182.731 32.9738 185.25 32.1343 185.25 29.1959C185.25 25.4179 181.472 23.7388 178.113 23.7388C173.076 23.7388 169.718 26.2574 169.298 31.2947H159.223C159.223 22.0597 167.199 16.1828 178.113 16.1828C189.028 16.1828 195.744 22.0597 195.744 32.1343V59H186.089V53.9627C183.151 58.1604 178.533 59.8396 173.496 59.8396ZM175.595 52.2836C180.632 52.2836 185.669 48.9254 185.669 43.0485V39.2705L177.694 40.5298C172.656 41.2854 168.878 42.6287 168.878 46.8265C168.878 50.6045 172.237 52.2836 175.595 52.2836ZM224.909 59.8396C217.857 59.8396 213.323 56.4813 211.896 53.9627V59H202.241V1.91038H212.316V22.0597C213.575 19.541 217.857 16.1828 224.909 16.1828C236.663 16.1828 244.219 25.4179 244.219 38.0112C244.219 51.444 236.663 59.8396 224.909 59.8396ZM223.23 51.444C230.366 51.444 234.144 46.4067 234.144 38.0112C234.144 31.2947 230.366 24.6623 223.23 24.6623C215.674 24.6623 212.316 31.2947 212.316 38.0112C212.316 44.7276 215.674 51.444 223.23 51.444ZM254.048 12.4048C250.69 12.4048 248.171 9.88613 248.171 6.52792C248.171 3.1697 250.69 0.651041 254.048 0.651041C257.407 0.651041 259.925 3.1697 259.925 6.52792C259.925 9.88613 257.407 12.4048 254.048 12.4048ZM259.086 59H249.011V17.0223H259.086V59Z"/>
+      </svg>
     </a>
     <div class="nav-right">
       <a href="/manifesto" class="nav-link">Read our manifesto</a>
@@ -687,10 +701,25 @@
     const content2 = document.getElementById('heroContent2');
     const landingOrb = document.getElementById('heroLandingOrb');
     const orbOverlay = document.getElementById('orbGlassOverlay');
+    const stickyEl = document.getElementById('heroOrbSticky');
+
+    // Magnetic hover: orb subtly attracts toward cursor
+    let heroMouseX = -9999, heroMouseY = -9999;
+    let magnetX = 0, magnetY = 0;
+    const MAGNET_RADIUS = 300;
+    const MAGNET_MAX = 20;
+    stickyEl.addEventListener('mousemove', e => {
+      const r = stickyEl.getBoundingClientRect();
+      heroMouseX = e.clientX - r.left;
+      heroMouseY = e.clientY - r.top;
+    });
+    stickyEl.addEventListener('mouseleave', () => {
+      heroMouseX = -9999; heroMouseY = -9999;
+    });
 
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    canvas.width = window.innerWidth * dpr;
-    canvas.height = window.innerHeight * dpr;
+    canvas.width = stickyEl.clientWidth * dpr;
+    canvas.height = stickyEl.clientHeight * dpr;
 
     const glass = new LiquidGlass(canvas);
     window._liquidGlass = glass;
@@ -784,8 +813,8 @@
       const btnVal = Math.round(255 - progress * (255 - 50));
       document.querySelectorAll('.glass-btn span').forEach(s => s.style.color = `rgb(${btnVal},${btnVal},${btnVal})`);
       document.querySelectorAll('.nav-link').forEach(l => l.style.color = `rgb(${btnVal},${btnVal},${btnVal})`);
-      // Wabi glyph dots: white in dark, dark in light
-      document.querySelectorAll('.wabi-glyph .dot').forEach(d => d.style.background = `rgb(${btnVal},${btnVal},${btnVal})`);
+      // Wabi logo: white in dark, dark in light
+      document.querySelectorAll('.wabi-logo .logo-dot, .wabi-logo .logo-text').forEach(d => d.style.fill = `rgb(${btnVal},${btnVal},${btnVal})`);
       // Button glass backgrounds: dimmer in dark mode, text stays fully bright
       const bgO = 0.5 + 0.5 * progress; // 0.5 at start → 1 at end
       document.querySelectorAll('.glass-btn').forEach(btn => {
@@ -801,7 +830,7 @@
       // Content-2: starts from below viewport, same pace as content-1 but ends later
       // Content-1 rate: 150px over 0.5 progress = 300px/unit
       // Content-2: 500px over ~0.8 progress range ≈ same feel
-      const c2Start = window.innerHeight * 0.8;
+      const c2Start = stickyEl.clientHeight * 0.8;
       const c2Slide = c2Start * (1 - smoothstep(0.1, 1.0, progress));
       content2.style.opacity = smoothstep(0.25, 0.5, progress);
       content2.style.transform = 'translateY(' + c2Slide + 'px)';
@@ -816,7 +845,7 @@
 
       // Smooth continuous animation — no discrete stages
       // posY: positive = up, negative = down
-      const vh = window.innerHeight;
+      const vh = stickyEl.clientHeight;
 
       // Position: linear rise throughout scroll
       const posEase = progress;
@@ -845,7 +874,29 @@
       glass.settings.refBlur = 10 * blurFade;
 
       glass.setShapeSize(diameter, diameter);
-      glass.setShapePosition(0, posY);
+
+      // Magnetic hover: attract orb toward cursor when near final position
+      const baseX = stickyEl.clientWidth / 2;
+      const baseScreenY = stickyEl.clientHeight / 2 - posY;
+      if (progress > 0.7 && heroMouseX > 0) {
+        const dx = heroMouseX - baseX;
+        const dy = heroMouseY - baseScreenY;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < MAGNET_RADIUS && dist > 1) {
+          const strength = Math.pow(1 - dist / MAGNET_RADIUS, 2) * MAGNET_MAX;
+          magnetX += ((dx / dist) * strength - magnetX) * 0.08;
+          magnetY += ((dy / dist) * strength - magnetY) * 0.08;
+        } else {
+          magnetX *= 0.92; magnetY *= 0.92;
+        }
+      } else {
+        magnetX *= 0.92; magnetY *= 0.92;
+      }
+      // Snap to zero when very small
+      if (Math.abs(magnetX) < 0.1) magnetX = 0;
+      if (Math.abs(magnetY) < 0.1) magnetY = 0;
+
+      glass.setShapePosition(magnetX, posY - magnetY);
 
       // Render the glass effect
       glass.render();
@@ -853,8 +904,8 @@
       // Position landing orb overlay (+ icon proportional to orb)
       const landingOpacity = smoothstep(0.7, 0.85, progress);
       landingOrb.style.opacity = landingOpacity;
-      landingOrb.style.left = '50%';
-      const orbScreenY = window.innerHeight / 2 - posY;
+      const orbScreenY = baseScreenY + magnetY;
+      landingOrb.style.left = (baseX + magnetX) + 'px';
       landingOrb.style.top = orbScreenY + 'px';
       landingOrb.style.width = diameter + 'px';
       landingOrb.style.height = diameter + 'px';
@@ -867,7 +918,7 @@
       // Position the PNG glass overlay to match the orb
       // Opacity: 10% at start, increases to 100% by end of scroll
       orbOverlay.style.opacity = (0.05 + 0.95 * smoothstep(0.6, 1.0, progress)) * loadEase;
-      orbOverlay.style.left = '50%';
+      orbOverlay.style.left = (baseX + magnetX) + 'px';
       orbOverlay.style.top = orbScreenY + 'px';
       orbOverlay.style.width = diameter + 'px';
       orbOverlay.style.height = diameter + 'px';
@@ -880,7 +931,7 @@
       }
 
       // Store current orb info for bubble spawning
-      window._orbInfo = { x: window.innerWidth / 2, y: orbScreenY, diameter: diameter };
+      window._orbInfo = { x: baseX + magnetX, y: orbScreenY, diameter: diameter };
 
       // Auto-spawn orbs when scroll sequence lands
       if (progress > 0.92 && !window._orbsSpawned) {
@@ -977,8 +1028,8 @@
 
     window.addEventListener('resize', () => {
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      canvas.width = window.innerWidth * dpr;
-      canvas.height = window.innerHeight * dpr;
+      canvas.width = stickyEl.clientWidth * dpr;
+      canvas.height = stickyEl.clientHeight * dpr;
       bgCanvas.width = canvas.width;
       bgCanvas.height = canvas.height;
       glass.resize(canvas.width, canvas.height);
