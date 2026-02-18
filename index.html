@@ -606,14 +606,12 @@
     }
     .orb-footer-section canvas {
       position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-      z-index: 1; touch-action: pan-y;
+      z-index: 1; pointer-events: none;
     }
     .orb-footer-section .cta-section {
-      position: relative; z-index: 2; pointer-events: none;
+      position: relative; z-index: 2;
       flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
     }
-    .orb-footer-section .cta-section .glass-btn-wrap,
-    .orb-footer-section .cta-section a { pointer-events: auto; }
     .orb-footer-section .cta-heading { color: #f0f0f0; }
     .orb-footer-section .section-sub { color: rgba(255,255,255,0.5); }
     .orb-footer-section .hero-input-wrap {
@@ -624,9 +622,8 @@
     .orb-footer-section .hero-input-wrap input::placeholder { color: rgba(255,255,255,0.35); }
     .orb-footer-section footer {
       position: relative; z-index: 2; border-top-color: rgba(255,255,255,0.1);
-      margin-top: auto; flex-shrink: 0; pointer-events: none;
+      margin-top: auto; flex-shrink: 0;
     }
-    .orb-footer-section footer a { pointer-events: auto; }
     .orb-footer-section .footer-glyph .dot { background: #f0f0f0; }
     .orb-footer-section .footer-wordmark { color: #f0f0f0; }
     .orb-footer-section .footer-links a { color: rgba(255,255,255,0.4); }
@@ -1823,16 +1820,7 @@
       ];
       Matter.Composite.add(engine.world, walls);
 
-      // Mouse constraint for dragging orbs — desktop only (touch devices scroll instead)
-      const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-      if (!isTouch) {
-        const mouse = Matter.Mouse.create(canvas);
-        mouse.pixelRatio = dpr;
-        const mouseConstraint = Matter.MouseConstraint.create(engine, {
-          mouse, constraint: { stiffness: 0.2, render: { visible: false } },
-        });
-        Matter.Composite.add(engine.world, mouseConstraint);
-      }
+      // No MouseConstraint — mouse repulsion handles interaction without blocking scroll
 
       // Drop 30 orbs with staggered timing
       for (let i = 0; i < DROP_COUNT; i++) {
@@ -1971,7 +1959,7 @@
         const cx = rect.width / 2;
         const cy = rect.height * 0.4;
         const orbs = Matter.Composite.allBodies(engine.world).filter(b => b.label === 'orb');
-        const radius = Math.min(rect.width, rect.height) * 0.32;
+        const radius = Math.min(rect.width, rect.height) * 0.42;
         circleMode = true;
         circleTargets.clear();
         engine.gravity.y = 0;
