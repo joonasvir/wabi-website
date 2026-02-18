@@ -7,6 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.20.0/matter.min.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -498,7 +499,141 @@
       margin: 0 auto;
     }
 
+    /* Orb Playground */
+    .orb-playground {
+      position: relative;
+      width: 100%;
+      height: 600px;
+      overflow: hidden;
+      cursor: pointer;
+      background: #fff;
+    }
+
+    .orb-playground canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    .orb-controls {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px;
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid #e8e8e8;
+      border-radius: 100px;
+      z-index: 10;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+    }
+
+    .orb-ctrl-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border: 1.5px solid transparent;
+      border-radius: 100px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      color: #555;
+      background: transparent;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .orb-ctrl-btn:hover {
+      background: #f0f0f0;
+      color: #111;
+    }
+
+    .orb-ctrl-btn.active {
+      background: #111;
+      color: #fff;
+      border-color: #111;
+    }
+
+    .orb-ctrl-btn svg {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+    }
+
+    .orb-ctrl-divider {
+      width: 1px;
+      height: 24px;
+      background: #e0e0e0;
+      flex-shrink: 0;
+    }
+
+    .orb-count {
+      position: absolute;
+      top: 20px;
+      left: 24px;
+      font-size: 13px;
+      color: #999;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .orb-count span {
+      font-size: 36px;
+      font-weight: 700;
+      color: #111;
+      display: block;
+      margin-top: 2px;
+    }
+
+    .orb-mode-label {
+      position: absolute;
+      top: 20px;
+      right: 24px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #aaa;
+      pointer-events: none;
+      user-select: none;
+    }
+
     /* Responsive */
+    @media (max-width: 768px) {
+      .orb-playground {
+        height: 480px;
+      }
+
+      .orb-controls {
+        gap: 4px;
+        padding: 4px;
+        flex-wrap: nowrap;
+        max-width: calc(100% - 32px);
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+      }
+
+      .orb-controls::-webkit-scrollbar { display: none; }
+
+      .orb-ctrl-btn {
+        padding: 7px 12px;
+        font-size: 12px;
+      }
+
+      .orb-ctrl-btn svg {
+        width: 14px;
+        height: 14px;
+      }
+    }
+
     @media (max-width: 640px) {
       .hero-heading {
         font-size: 32px;
@@ -709,6 +844,43 @@
     </form>
   </section>
 
+  <!-- Orb Playground -->
+  <div class="orb-playground" id="orbPlayground">
+    <canvas id="orbCanvas"></canvas>
+    <div class="orb-count">
+      Apps created<span id="orbCount">0</span>
+    </div>
+    <div class="orb-mode-label" id="orbModeLabel"></div>
+    <div class="orb-controls">
+      <button class="orb-ctrl-btn" id="btnDrop" title="Drop an orb">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Drop
+      </button>
+      <div class="orb-ctrl-divider"></div>
+      <button class="orb-ctrl-btn active" id="btnPhysics" title="Physics mode">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="12" y1="16" x2="14" y2="14"/></svg>
+        Physics
+      </button>
+      <button class="orb-ctrl-btn" id="btnCyclone" title="Cyclone mode">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.9 0 1.8-.1 2.6-.4"/><path d="M12 8a4 4 0 1 0 4 4"/><circle cx="12" cy="12" r="1"/></svg>
+        Cyclone
+      </button>
+      <button class="orb-ctrl-btn" id="btnShapes" title="Shapes mode">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="12 2 22 20 2 20"/></svg>
+        Shapes
+      </button>
+      <button class="orb-ctrl-btn" id="btnMoon" title="Moon gravity">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        Moon
+      </button>
+      <div class="orb-ctrl-divider"></div>
+      <button class="orb-ctrl-btn" id="btnClear" title="Clear all orbs">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+        Clear
+      </button>
+    </div>
+  </div>
+
   <!-- Footer -->
   <footer>
     <a href="/" class="footer-logo">
@@ -723,5 +895,476 @@
     </div>
   </footer>
 
+  <script>
+  (function() {
+    const WABI_API_URL = 'https://api.wabi.ai/api/v1/app/random-covers?count=30';
+    const FALLBACK_ORBS = [
+      'https://i.imgur.com/4Aq1p5V.png','https://i.imgur.com/qx8f4iH.png','https://i.imgur.com/AWPO3TG.png',
+      'https://i.imgur.com/p9lsZOd.png','https://i.imgur.com/vwH7fhY.png','https://i.imgur.com/LMjFvVQ.png',
+      'https://i.imgur.com/SfPZogI.png','https://i.imgur.com/4MhFEwN.png','https://i.imgur.com/cv5FCFY.png',
+      'https://i.imgur.com/D5A4UUJ.png','https://i.imgur.com/PFsPgBN.png','https://i.imgur.com/B70veGi.png',
+      'https://i.imgur.com/AehAw57.png','https://i.imgur.com/rwgRwAj.png','https://i.imgur.com/ojY9Fs3.png',
+      'https://i.imgur.com/SU1ihwl.png','https://i.imgur.com/ct0AeRD.png','https://i.imgur.com/0uZCyTe.png',
+      'https://i.imgur.com/8dKpawM.png','https://i.imgur.com/EBMFd7A.png','https://i.imgur.com/34OFX6f.png',
+      'https://i.imgur.com/nh6p2J0.png','https://i.imgur.com/9GEdegS.png','https://i.imgur.com/IUMWj6Y.png',
+      'https://i.imgur.com/etdgUOx.png','https://i.imgur.com/6LgF0YR.png','https://i.imgur.com/7MqgR3i.png',
+      'https://i.imgur.com/txHoBrO.png','https://i.imgur.com/iV88FY2.png','https://i.imgur.com/FAoVMHq.png',
+    ];
+    const BASE_RADIUS = 42;
+    const MIN_SCALE = 0.9;
+    const MAX_SCALE = 1.1;
+    const SHAPES = ['triangle','circle','square','hexagon','heart','diamond','star','spiral','grid','wave'];
+    const DAMPING = 0.005;
+
+    const container = document.getElementById('orbPlayground');
+    const canvas = document.getElementById('orbCanvas');
+    const countEl = document.getElementById('orbCount');
+    const modeLabel = document.getElementById('orbModeLabel');
+    const btnDrop = document.getElementById('btnDrop');
+    const btnPhysics = document.getElementById('btnPhysics');
+    const btnCyclone = document.getElementById('btnCyclone');
+    const btnShapes = document.getElementById('btnShapes');
+    const btnMoon = document.getElementById('btnMoon');
+    const btnClear = document.getElementById('btnClear');
+
+    let engine, walls = [];
+    let orbDataMap = new Map();
+    let preloadedImages = new Map();
+    let coverUrls = [];
+    let overlayImage = null;
+    let orbAnimData = new Map();
+    let displayMode = 'physics';
+    let moonMode = false;
+    let currentShape = 0;
+    let cycloneTime = 0;
+    let cycloneFocalAngle = 0;
+    let animationId;
+    let mouseConstraint;
+
+    function getContainerRect() {
+      return container.getBoundingClientRect();
+    }
+
+    async function fetchCovers() {
+      try {
+        const res = await fetch(WABI_API_URL);
+        if (!res.ok) throw new Error();
+        const json = await res.json();
+        const urls = json.data?.covers || [];
+        if (urls.length > 0) return urls;
+      } catch(e) {}
+      return [];
+    }
+
+    async function preloadImages() {
+      const urls = await fetchCovers();
+      coverUrls = urls;
+      const all = [...urls, ...FALLBACK_ORBS];
+      await Promise.all(all.map(url => new Promise(resolve => {
+        if (preloadedImages.has(url)) return resolve();
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => { preloadedImages.set(url, img); resolve(); };
+        img.onerror = () => resolve();
+        img.src = url;
+      })));
+    }
+
+    function getRandomCover() {
+      const urls = coverUrls.length > 0 ? coverUrls : FALLBACK_ORBS;
+      return urls[Math.floor(Math.random() * urls.length)];
+    }
+
+    function updateCount() {
+      const n = Matter.Composite.allBodies(engine.world).filter(b => b.label === 'orb').length;
+      countEl.textContent = n;
+    }
+
+    function updateModeLabel() {
+      if (displayMode === 'cyclone') modeLabel.textContent = 'CYCLONE';
+      else if (displayMode === 'shapes') modeLabel.textContent = SHAPES[currentShape].toUpperCase();
+      else if (moonMode) modeLabel.textContent = 'MOON';
+      else modeLabel.textContent = '';
+    }
+
+    function setActiveBtn(activeId) {
+      [btnPhysics, btnCyclone, btnShapes].forEach(b => b.classList.remove('active'));
+      document.getElementById(activeId)?.classList.add('active');
+    }
+
+    function addOrb(x) {
+      const rect = getContainerRect();
+      const w = rect.width;
+      const h = rect.height;
+      const scale = MIN_SCALE + Math.random() * (MAX_SCALE - MIN_SCALE);
+      const radius = BASE_RADIUS * scale;
+      const posX = x !== undefined ? x : Math.random() * (w - radius * 2) + radius;
+      const posY = -radius * 2;
+      const imageUrl = getRandomCover();
+
+      const orb = Matter.Bodies.circle(posX, posY, radius, {
+        restitution: 0.8,
+        friction: 0.05,
+        frictionAir: DAMPING,
+        density: 0.001,
+        label: 'orb',
+        slop: 0.01,
+        sleepThreshold: 30,
+      });
+
+      const data = {
+        imageUrl: imageUrl,
+        image: preloadedImages.get(imageUrl) || null,
+      };
+
+      if (!data.image) {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => { data.image = img; preloadedImages.set(imageUrl, img); };
+        img.src = imageUrl;
+      }
+
+      orbDataMap.set(orb.id, data);
+      Matter.Composite.add(engine.world, orb);
+      updateCount();
+    }
+
+    function clearOrbs() {
+      Matter.Composite.allBodies(engine.world).filter(b => b.label === 'orb').forEach(orb => {
+        orbDataMap.delete(orb.id);
+        orbAnimData.delete(orb.id);
+        Matter.Composite.remove(engine.world, orb);
+      });
+      updateCount();
+    }
+
+    function setMode(mode) {
+      if (mode === 'shapes' && displayMode === 'shapes') {
+        currentShape = (currentShape + 1) % SHAPES.length;
+      }
+      displayMode = mode;
+      if (mode === 'physics') {
+        engine.gravity.y = moonMode ? -0.4 : 1;
+        // Unfreeze all orbs
+        Matter.Composite.allBodies(engine.world).filter(b => b.label === 'orb').forEach(b => {
+          Matter.Body.setStatic(b, false);
+          Matter.Sleeping.set(b, false);
+        });
+      }
+      setActiveBtn(mode === 'physics' ? 'btnPhysics' : mode === 'cyclone' ? 'btnCyclone' : 'btnShapes');
+      updateModeLabel();
+    }
+
+    function toggleMoon() {
+      moonMode = !moonMode;
+      btnMoon.classList.toggle('active', moonMode);
+      if (displayMode === 'physics') {
+        engine.gravity.y = moonMode ? -0.4 : 1;
+      }
+      updateModeLabel();
+    }
+
+    function generateShapePositions(shape, count, centerX, centerY, maxW, maxH) {
+      const positions = [];
+      if (count === 0) return positions;
+      const padding = 60;
+      const maxWidth = maxW - padding * 2;
+      const maxHeight = maxH - padding * 2;
+      const orbSize = BASE_RADIUS * 2.2;
+
+      function scaleToFit(pts) {
+        if (!pts.length) return pts;
+        let minX = Infinity, maxX2 = -Infinity, minY = Infinity, maxY2 = -Infinity;
+        pts.forEach(p => { minX = Math.min(minX, p.x); maxX2 = Math.max(maxX2, p.x); minY = Math.min(minY, p.y); maxY2 = Math.max(maxY2, p.y); });
+        const w = maxX2 - minX + orbSize;
+        const h = maxY2 - minY + orbSize;
+        const s = Math.min(1, maxWidth / w, maxHeight / h);
+        const ox = (minX + maxX2) / 2;
+        const oy = (minY + maxY2) / 2;
+        return pts.map(p => ({ x: centerX + (p.x - ox) * s, y: centerY + (p.y - oy) * s }));
+      }
+
+      if (shape === 'circle') {
+        const r = Math.max(orbSize, count * orbSize / (2 * Math.PI));
+        for (let i = 0; i < count; i++) { const a = (i / count) * Math.PI * 2 - Math.PI / 2; positions.push({ x: Math.cos(a) * r, y: Math.sin(a) * r }); }
+      } else if (shape === 'triangle') {
+        const rows = Math.ceil((-1 + Math.sqrt(1 + 8 * count)) / 2); let idx = 0;
+        for (let row = 0; row < rows && idx < count; row++) { const rc = row + 1; for (let col = 0; col < rc && idx < count; col++) { positions.push({ x: (col - rc / 2 + 0.5) * orbSize, y: (row - rows / 2 + 0.5) * orbSize }); idx++; } }
+      } else if (shape === 'square') {
+        const side = Math.ceil(Math.sqrt(count)); let idx = 0;
+        for (let r = 0; r < side && idx < count; r++) for (let c = 0; c < side && idx < count; c++) { positions.push({ x: (c - side / 2 + 0.5) * orbSize, y: (r - side / 2 + 0.5) * orbSize }); idx++; }
+      } else if (shape === 'hexagon') {
+        let placed = 0, ring = 0;
+        while (placed < count) { if (ring === 0) { positions.push({ x: 0, y: 0 }); placed++; } else { const rc = ring * 6; for (let i = 0; i < rc && placed < count; i++) { const a = (i / rc) * Math.PI * 2 - Math.PI / 2; positions.push({ x: Math.cos(a) * ring * orbSize, y: Math.sin(a) * ring * orbSize }); placed++; } } ring++; }
+      } else if (shape === 'heart') {
+        for (let i = 0; i < count; i++) { const t = (i / count) * Math.PI * 2; positions.push({ x: 16 * Math.pow(Math.sin(t), 3) * 8, y: -(13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t)) * 8 }); }
+      } else if (shape === 'diamond') {
+        const size = Math.ceil(Math.sqrt(count * 2)); let idx = 0;
+        for (let r = 0; r < size && idx < count; r++) { const rw = r < size / 2 ? r + 1 : size - r; for (let c = 0; c < rw && idx < count; c++) { positions.push({ x: (c - rw / 2 + 0.5) * orbSize, y: (r - size / 2 + 0.5) * orbSize }); idx++; } }
+      } else if (shape === 'star') {
+        const pts = 5; const outerR = Math.max(orbSize * 2, count * orbSize / (pts * 2)); const innerR = outerR * 0.4;
+        for (let i = 0; i < count; i++) { const a = (i / count) * Math.PI * 2 - Math.PI / 2; const isO = Math.floor(i * pts * 2 / count) % 2 === 0; positions.push({ x: Math.cos(a) * (isO ? outerR : innerR), y: Math.sin(a) * (isO ? outerR : innerR) }); }
+      } else if (shape === 'spiral') {
+        const turns = Math.max(2, count / 8);
+        for (let i = 0; i < count; i++) { const t = (i / count) * turns * Math.PI * 2; const r = (i / count) * Math.min(maxWidth, maxHeight) * 0.4; positions.push({ x: Math.cos(t) * r, y: Math.sin(t) * r }); }
+      } else if (shape === 'grid') {
+        const cols = Math.ceil(Math.sqrt(count * (maxWidth / maxHeight))); const rows = Math.ceil(count / cols); let idx = 0;
+        for (let r = 0; r < rows && idx < count; r++) for (let c = 0; c < cols && idx < count; c++) { positions.push({ x: (c - cols / 2 + 0.5) * orbSize, y: (r - rows / 2 + 0.5) * orbSize }); idx++; }
+      } else if (shape === 'wave') {
+        const cols = Math.ceil(Math.sqrt(count * 2)); const rows = Math.ceil(count / cols); let idx = 0;
+        for (let r = 0; r < rows && idx < count; r++) for (let c = 0; c < cols && idx < count; c++) { positions.push({ x: (c - cols / 2 + 0.5) * orbSize, y: (r - rows / 2 + 0.5) * orbSize + Math.sin(c * 0.8) * orbSize * 1.5 }); idx++; }
+      }
+      return scaleToFit(positions);
+    }
+
+    async function init() {
+      await preloadImages();
+
+      // Load overlay
+      await new Promise(resolve => {
+        const img = new Image();
+        img.onload = () => { overlayImage = img; resolve(); };
+        img.onerror = () => resolve();
+        img.src = '/orb-overlay.png';
+      });
+
+      const rect = getContainerRect();
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      const ctx = canvas.getContext('2d');
+      ctx.scale(dpr, dpr);
+
+      engine = Matter.Engine.create({ gravity: { x: 0, y: 1 }, enableSleeping: true });
+      engine.positionIterations = 6;
+      engine.velocityIterations = 4;
+
+      const wallT = 50;
+      const w = rect.width;
+      const h = rect.height;
+      walls = [
+        Matter.Bodies.rectangle(w / 2, h + wallT / 2, w * 2, wallT, { isStatic: true, label: 'wall' }),
+        Matter.Bodies.rectangle(-wallT / 2, h / 2, wallT, h * 2, { isStatic: true, label: 'wall' }),
+        Matter.Bodies.rectangle(w + wallT / 2, h / 2, wallT, h * 2, { isStatic: true, label: 'wall' }),
+      ];
+      Matter.Composite.add(engine.world, walls);
+
+      // Mouse constraint
+      const mouse = Matter.Mouse.create(canvas);
+      mouseConstraint = Matter.MouseConstraint.create(engine, {
+        mouse: mouse,
+        constraint: { stiffness: 0.2, render: { visible: false } },
+      });
+      mouse.pixelRatio = dpr;
+      Matter.Composite.add(engine.world, mouseConstraint);
+
+      // Click to add orb (if not clicking an existing one)
+      let mouseDownTime = 0;
+      let mouseDownPos = { x: 0, y: 0 };
+      let mouseDownBody = null;
+
+      Matter.Events.on(mouseConstraint, 'mousedown', () => {
+        mouseDownTime = Date.now();
+        mouseDownPos = { x: mouse.position.x, y: mouse.position.y };
+        mouseDownBody = mouseConstraint.body;
+      });
+
+      Matter.Events.on(mouseConstraint, 'mouseup', () => {
+        const elapsed = Date.now() - mouseDownTime;
+        const dx = mouse.position.x - mouseDownPos.x;
+        const dy = mouse.position.y - mouseDownPos.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (elapsed < 200 && dist < 10 && !mouseDownBody) {
+          addOrb(mouse.position.x);
+        }
+        mouseDownBody = null;
+      });
+
+      // Drop a few orbs to start
+      for (let i = 0; i < 5; i++) {
+        setTimeout(() => addOrb(), i * 200);
+      }
+
+      function render() {
+        const rect = getContainerRect();
+        const w = rect.width;
+        const h = rect.height;
+        const centerX = w / 2;
+        const centerY = h / 2;
+
+        ctx.clearRect(0, 0, w, h);
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(0, 0, w, h);
+
+        const orbs = Matter.Composite.allBodies(engine.world).filter(b => b.label === 'orb');
+
+        if (displayMode === 'cyclone') {
+          cycloneTime += 0.016;
+          cycloneFocalAngle += 0.003;
+        }
+
+        if (displayMode === 'shapes') {
+          const shape = SHAPES[currentShape];
+          const positions = generateShapePositions(shape, orbs.length, centerX, centerY, w, h);
+          orbs.forEach((body, i) => {
+            if (i < positions.length) {
+              let ad = orbAnimData.get(body.id);
+              if (!ad) { ad = { angle: 0, radius: 0, speed: 0 }; orbAnimData.set(body.id, ad); }
+              ad.targetX = positions[i].x;
+              ad.targetY = positions[i].y;
+            }
+          });
+        }
+
+        const renderData = [];
+
+        orbs.forEach((body, index) => {
+          const data = orbDataMap.get(body.id);
+          const baseRadius = body.circleRadius || BASE_RADIUS;
+          let radius = baseRadius;
+          let drawX = body.position.x;
+          let drawY = body.position.y;
+          let drawAngle = body.angle;
+          let zDepth = 0;
+
+          let ad = orbAnimData.get(body.id);
+          if (!ad) {
+            ad = { angle: Math.random() * Math.PI * 2, radius: 120 + Math.random() * 180, speed: 0.2 + Math.random() * 0.3 };
+            orbAnimData.set(body.id, ad);
+          }
+
+          if (displayMode === 'cyclone') {
+            const time = cycloneTime;
+            const focalAngle = cycloneFocalAngle;
+            if (ad.zLayer === undefined) {
+              ad.zLayer = Math.random();
+              ad.joinTime = time;
+              ad.ellipseRatioY = 0.4 + Math.random() * 0.15;
+              ad.phaseOffset = Math.random() * Math.PI * 2;
+              ad.wobbleSpeed = 0.2 + Math.random() * 0.5;
+              ad.wobbleAmount = 20 + Math.random() * 30;
+              ad.driftX = (Math.random() - 0.5) * 0.1;
+              ad.driftY = (Math.random() - 0.5) * 0.08;
+              ad.tiltPhase = Math.random() * Math.PI * 2;
+            }
+            const zLayer = ad.zLayer;
+            const timeSinceJoin = time - (ad.joinTime || 0);
+            const catchUp = Math.min(1, timeSinceJoin / 3);
+            const catchUpEase = 1 - Math.pow(1 - catchUp, 3);
+            const depthSpeed = 0.15 + zLayer * 0.35;
+            const screenSize = Math.min(w, h);
+            const baseRX = (screenSize * 0.38) * (0.7 + zLayer * 0.5);
+            const baseRY = baseRX * ad.ellipseRatioY;
+            const angle = ad.angle + time * depthSpeed;
+            const wi = 0.6 + zLayer * 0.6;
+            const w1 = Math.sin(time * ad.wobbleSpeed + ad.phaseOffset) * ad.wobbleAmount * wi;
+            const w2 = Math.sin(time * 0.3 + index * 0.5) * 15 * wi;
+            const w3 = Math.cos(time * 0.15 + ad.phaseOffset * 2) * 12 * wi;
+            const w4 = Math.sin(time * 0.1 + index) * 10 * wi;
+            const breathe = Math.sin(time * 0.12 + index * 0.15) * 30 * wi;
+            const rX = baseRX + w1 + breathe;
+            const rY = baseRY + w2 * 0.4 + breathe * 0.3;
+            const dOX = Math.sin(time * ad.driftX + ad.tiltPhase) * 30 * wi;
+            const dOY = Math.cos(time * ad.driftY + ad.tiltPhase) * 20 * wi;
+            const tX = centerX + Math.cos(angle) * rX + dOX + w3;
+            const tY = centerY + Math.sin(angle) * rY + dOY + w4;
+            const eX = centerX + (Math.random() - 0.5) * 100;
+            const eY = -100;
+            drawX = eX + (tX - eX) * catchUpEase;
+            drawY = eY + (tY - eY) * catchUpEase;
+            const angleFromFocal = Math.abs(Math.sin(angle - focalAngle));
+            const focalBoost = 1 + angleFromFocal * 0.5 * zLayer;
+            const depthScale = (0.4 + zLayer * 1.6) * focalBoost;
+            radius = baseRadius * depthScale * catchUpEase;
+            zDepth = zLayer;
+            drawAngle = Math.sin(time * 0.2 + ad.phaseOffset) * 0.15;
+            Matter.Body.setPosition(body, { x: drawX, y: drawY });
+            Matter.Body.setStatic(body, true);
+          } else if (displayMode === 'shapes') {
+            if (ad.targetX !== undefined && ad.targetY !== undefined) {
+              const dx = ad.targetX - body.position.x;
+              const dy = ad.targetY - body.position.y;
+              const nx = body.position.x + dx * 0.08;
+              const ny = body.position.y + dy * 0.08;
+              Matter.Body.setPosition(body, { x: nx, y: ny });
+              Matter.Body.setStatic(body, true);
+              drawX = nx;
+              drawY = ny;
+            }
+          } else {
+            Matter.Body.setStatic(body, false);
+          }
+
+          renderData.push({ body, data, drawX, drawY, drawAngle, radius, zDepth });
+        });
+
+        if (displayMode === 'cyclone') renderData.sort((a, b) => a.zDepth - b.zDepth);
+
+        renderData.forEach(({ data, drawX, drawY, drawAngle, radius }) => {
+          ctx.save();
+          ctx.translate(drawX, drawY);
+          ctx.rotate(drawAngle);
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(0, 0, radius, 0, Math.PI * 2);
+          ctx.closePath();
+          ctx.clip();
+          if (data?.image) {
+            ctx.drawImage(data.image, -radius, -radius, radius * 2, radius * 2);
+          } else {
+            ctx.fillStyle = '#ddd';
+            ctx.fill();
+          }
+          ctx.restore();
+          if (overlayImage) {
+            ctx.drawImage(overlayImage, -radius, -radius, radius * 2, radius * 2);
+          }
+          ctx.restore();
+        });
+
+        if (displayMode === 'physics') {
+          Matter.Engine.update(engine, 1000 / 60);
+        }
+
+        animationId = requestAnimationFrame(render);
+      }
+
+      render();
+
+      // Resize handler
+      function handleResize() {
+        const rect = getContainerRect();
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = rect.width * dpr;
+        canvas.height = rect.height * dpr;
+        ctx.resetTransform();
+        ctx.scale(dpr, dpr);
+        const wallT = 50;
+        Matter.Body.setPosition(walls[0], { x: rect.width / 2, y: rect.height + wallT / 2 });
+        Matter.Body.setPosition(walls[1], { x: -wallT / 2, y: rect.height / 2 });
+        Matter.Body.setPosition(walls[2], { x: rect.width + wallT / 2, y: rect.height / 2 });
+      }
+
+      window.addEventListener('resize', handleResize);
+
+      // Button handlers
+      btnDrop.addEventListener('click', (e) => { e.stopPropagation(); addOrb(); });
+      btnPhysics.addEventListener('click', (e) => { e.stopPropagation(); setMode('physics'); });
+      btnCyclone.addEventListener('click', (e) => { e.stopPropagation(); setMode('cyclone'); });
+      btnShapes.addEventListener('click', (e) => { e.stopPropagation(); setMode('shapes'); });
+      btnMoon.addEventListener('click', (e) => { e.stopPropagation(); toggleMoon(); });
+      btnClear.addEventListener('click', (e) => { e.stopPropagation(); clearOrbs(); });
+    }
+
+    // Start when in viewport (lazy init)
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        observer.disconnect();
+        init();
+      }
+    }, { threshold: 0.1 });
+    observer.observe(container);
+  })();
+  </script>
 </body>
 </html>
