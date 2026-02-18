@@ -1927,6 +1927,8 @@
           circleMode = false;
           circleTargets.clear();
           engine.gravity.y = 0.8;
+          const orbs = Matter.Composite.allBodies(engine.world).filter(b => b.label === 'orb');
+          orbs.forEach(body => { body.collisionFilter.group = 0; });
         }
       }
 
@@ -1945,6 +1947,7 @@
           const tx = cx + Math.cos(angle) * radius;
           const ty = cy + Math.sin(angle) * radius;
           circleTargets.set(body.id, { x: tx, y: ty });
+          body.collisionFilter.group = -1; // disable orb-orb collisions
           Matter.Body.setVelocity(body, { x: 0, y: 0 });
           Matter.Body.setPosition(body, { x: tx, y: ty });
         });
