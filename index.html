@@ -889,19 +889,23 @@
       stickyEl.appendChild(el);
       if (opts.track) landingOrbEls.push(el);
 
-      const driftX = (opts.spreadX || 1) * (Math.random() - 0.5) * 300;
+      const driftX = (opts.spreadX || 1) * (Math.random() - 0.5) * 250;
       const floatY = -(info.y + 200 + Math.random() * 300); // float all the way up and off screen
-      const wobbleX = (Math.random() - 0.5) * 80; // extra wobble mid-flight
+      const wobbleX1 = (Math.random() - 0.5) * 100;
+      const wobbleX2 = (Math.random() - 0.5) * 120;
+      const wobbleX3 = (Math.random() - 0.5) * 80;
       const delay = opts.delay || 0;
-      const dur = 2500 + Math.random() * 2000;
+      const dur = 5000 + Math.random() * 2000;
       const peakScale = 0.7 + Math.random() * 0.5;
 
       el.animate([
         { transform: 'translate(0, 0) scale(0)', opacity: 0 },
-        { transform: `translate(${driftX * 0.3 + wobbleX}px, ${floatY * 0.2}px) scale(${peakScale})`, opacity: 0.9, offset: 0.15 },
-        { transform: `translate(${driftX * 0.6}px, ${floatY * 0.5}px) scale(${peakScale * 0.9})`, opacity: 0.7, offset: 0.4 },
-        { transform: `translate(${driftX}px, ${floatY}px) scale(${peakScale * 0.5})`, opacity: 0 }
-      ], { duration: dur, delay, easing: 'cubic-bezier(0.2, 0.8, 0.3, 1)', fill: 'forwards' }).onfinish = () => el.remove();
+        { transform: `translate(${driftX * 0.15 + wobbleX1}px, ${floatY * 0.1}px) scale(${peakScale})`, opacity: 0.85, offset: 0.1 },
+        { transform: `translate(${driftX * 0.3 + wobbleX2}px, ${floatY * 0.3}px) scale(${peakScale * 0.95})`, opacity: 0.75, offset: 0.3 },
+        { transform: `translate(${driftX * 0.55 + wobbleX3}px, ${floatY * 0.55}px) scale(${peakScale * 0.85})`, opacity: 0.6, offset: 0.55 },
+        { transform: `translate(${driftX * 0.8 + wobbleX1 * 0.5}px, ${floatY * 0.8}px) scale(${peakScale * 0.7})`, opacity: 0.35, offset: 0.8 },
+        { transform: `translate(${driftX}px, ${floatY}px) scale(${peakScale * 0.4})`, opacity: 0 }
+      ], { duration: dur, delay, easing: 'ease-in-out', fill: 'forwards' }).onfinish = () => el.remove();
     }
 
     function spawnLandingOrbs() {
