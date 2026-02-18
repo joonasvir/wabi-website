@@ -652,10 +652,10 @@ class LiquidGlass {
     this.shapeY = 0;
 
     // Mouse cursor tracking with spring
-    this.mouseX = w / 2;
-    this.mouseY = h / 2;
-    this.mouseSpringX = w / 2;
-    this.mouseSpringY = h / 2;
+    this.mouseX = canvas.width / 2;
+    this.mouseY = canvas.height / 2;
+    this.mouseSpringX = canvas.width / 2;
+    this.mouseSpringY = canvas.height / 2;
     this.mouseActive = false;
   }
 
